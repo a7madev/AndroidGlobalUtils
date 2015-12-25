@@ -1,13 +1,24 @@
 package me.a7madev.androidglobalutils;
 
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class GlobalUtils {
 
@@ -142,5 +153,94 @@ public class GlobalUtils {
      */
     public static int[] getIntArray(Context context, int arrayResId) {
         return context.getResources().getIntArray(arrayResId);
+    }
+
+
+    /**
+     * Convert String Array to Array List
+     * @param stringArray  String Array
+     * @return String Array List
+     */
+    public static ArrayList<String> convertStringArrayToArrayList(String[] stringArray) {
+        if(stringArray != null && stringArray.length > 0){
+            return new ArrayList<>(Arrays.asList(stringArray));
+        }else{
+            return null;
+        }
+    }
+
+
+    /**
+     * Get content from clipboard
+     * @return String clipboard content
+     */
+    public static String getContentFromClipboard(Context context) {
+
+        // initialize paste data string
+        String pasteData = "";
+
+        // get data from clip board
+        try {
+            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
+            pasteData = item.getText().toString();
+        } catch (Exception e) {
+            GlobalUtils.logThis(TAG, "getContentFromClipboard Exception", e);
+        }
+
+        return pasteData;
+    }
+
+    /**
+     * Request Multiple Permissions (Android M+)
+     * @param activity  Activity reference
+     * @param permissionsList  new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+     *                         <permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+     * @param requestCode  Application specific request code to match with a result reported to
+     */
+    @TargetApi(Build.VERSION_CODES.M)
+    public static void requestMultiplePermissions(Activity activity, String[] permissionsList, int requestCode) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // init permissions list
+            List<String> permissions = new ArrayList<>();
+
+            // loop through permissions
+            for (String permission : permissionsList) {
+                if (activity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                    permissions.add(permission);
+                }
+            }
+
+            // if permissions list is not empty, request permission
+            if (!permissions.isEmpty()) {
+                activity.requestPermissions(permissions.toArray(new String[permissions.size()]), requestCode);
+            }
+        }
+    }
+
+
+    /**
+     * Initialize Progress Dialog
+     * @param context  The context to use. Use application or activity context
+     * @param message String: progress dialog message
+     * @param isCancelable boolean: is cancelable
+     */
+    public static ProgressDialog initProgressDialog(Context context, String message, boolean isCancelable, boolean isIndeterminate) {
+        ProgressDialog loadingDialog = null;
+        try {
+            if(context != null) {
+                if (message == null) {
+                    message = "Loading. Please wait...";
+                }
+
+                loadingDialog = new ProgressDialog(context);
+                loadingDialog.setCancelable(isCancelable);
+                loadingDialog.setMessage(message);
+                loadingDialog.setIndeterminate(isIndeterminate);
+            }
+        } catch (Exception e) {
+            logThis(TAG, "initProgressDialog Exception", e);
+        }
+        return loadingDialog;
     }
 }

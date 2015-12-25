@@ -5,14 +5,14 @@ AndroidGlobalUtils
 
 Global Utilities for Android
 
-# <i class="icon-download"> Installation
+# Installation
 
 ## Gradle
 
 #### Step 1: Add to project build.gradle
 
     dependencies {
-        compile 'me.a7madev.androidglobalutils:library:1.0.1'
+        compile 'me.a7madev.androidglobalutils:library:1.0.3'
     }
 
 #### Step 2: Import package in your java class
@@ -21,28 +21,51 @@ Global Utilities for Android
 
 # Usage
 
-
 GlobalUtils Class
+----------
+
 :   isDebug
 > Is build in debug config or release
+
 :   logThis
 > Log message and exception
+
 :   showToast
 > Make a standard toast that just contains a text view.
+
 :   checkForInternetConnection
 > Check if Internet is available and connected
+
 :   getTypeFace
 > Get an array of heterogeneous values.
+
 :   getTypedArrayResource
 > Create a new typeface from font file.
+
 :   getStringArray
 > Return the string array associated with a particular resource ID.
+
 :   getIntArray
 > Return the int array associated with a particular resource ID.
 
+:   convertStringArrayToArrayList
+> Convert String Array to Array List
+
+:   getContentFromClipboard
+> Get content from clipboard
+
+:  requestMultiplePermissions
+> Request Multiple Permissions (Android M+)
+
+:  initProgressDialog
+> Initialize Progress Dialog
+
 GlobalFileUtils Class
+----------
+
 :   openFileIntent
 > Open File using intent
+
 :   getMimeType
 > Get File Mime Type
 
