@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
 
 android {
     compileSdkVersion 23
@@ -23,3 +24,27 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
 }
+
+ext {
+    // Where you will see your artifact in Bintray's web interface
+    // The "bintrayName" should match the name of the Bintray repro.
+    bintrayRepo = 'maven'
+    bintrayName = 'AndroidGlobalUtils'
+
+    // Maven metadata
+    publishedGroupId = 'me.a7madev.androidglobalutils'
+    libraryName = 'library'
+    // Save yourself a head ache, and set this equal to the name of the Android Studio library
+    // module. The artifact name needs to match the name of the library.
+    artifact = 'library'
+
+    libraryDescription = 'Android Global Utilities Library'
+    libraryVersion = '1.0.0'
+
+    developerId = 'a7madev'
+    developerName = 'A7maDev'
+    developerEmail = 'a7madev@gmail.com'
+}
+
+apply from: 'https://raw.githubusercontent.com/attwellBrian/JCenter/master/installv1.gradle'
+apply from: 'https://raw.githubusercontent.com/attwellBrian/JCenter/master/bintrayv1.gradle'
