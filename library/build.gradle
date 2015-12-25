@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 103
-        versionName "1.0.3"
+        versionCode 104
+        versionName "1.0.4"
     }
     buildTypes {
         release {
@@ -39,7 +39,7 @@ ext {
     artifact = 'library'
 
     libraryDescription = 'Android Global Utilities Library'
-    libraryVersion = '1.0.3'
+    libraryVersion = '1.0.4'
 
     developerId = 'a7madev'
     developerName = 'A7maDev'

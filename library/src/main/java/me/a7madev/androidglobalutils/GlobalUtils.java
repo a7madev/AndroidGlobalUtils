@@ -172,6 +172,7 @@ public class GlobalUtils {
 
     /**
      * Get content from clipboard
+     * @param context  The context to use. Use application or activity context
      * @return String clipboard content
      */
     public static String getContentFromClipboard(Context context) {
@@ -195,7 +196,7 @@ public class GlobalUtils {
      * Request Multiple Permissions (Android M+)
      * @param activity  Activity reference
      * @param permissionsList  new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE};
-     *                         <permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+     *                         + Add permission to manifest.xml "permission android:name="android.permission.READ_EXTERNAL_STORAGE"
      * @param requestCode  Application specific request code to match with a result reported to
      */
     @TargetApi(Build.VERSION_CODES.M)
@@ -224,6 +225,8 @@ public class GlobalUtils {
      * @param context  The context to use. Use application or activity context
      * @param message String: progress dialog message
      * @param isCancelable boolean: is cancelable
+     * @param isIndeterminate boolean: is indeterminate
+     * @return  ProgressDialog Progress Dialog object
      */
     public static ProgressDialog initProgressDialog(Context context, String message, boolean isCancelable, boolean isIndeterminate) {
         ProgressDialog loadingDialog = null;
