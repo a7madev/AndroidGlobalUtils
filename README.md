@@ -12,7 +12,7 @@ Global Utilities for Android
 #### Step 1: Add to project build.gradle
 
     dependencies {
-        compile 'me.a7madev.androidglobalutils:library:1.0.5'
+        compile 'me.a7madev.androidglobalutils:library:1.0.8'
     }
 
 #### Step 2: Import package in your java class
@@ -63,6 +63,15 @@ GlobalUtils Class
 :  dismissProgressDialog
 > Dismiss Progress Dialog
 
+:  getBitmapByResourceID
+> Get Bitmap by Resource ID
+
+:  openShareFileIntent
+> Opens share file intent
+
+:  openShareTextIntent
+> Open share text intent
+
 GlobalFileUtils Class
 ----------
 
@@ -78,12 +87,14 @@ GlobalFileUtils Class
 :   getFilesListFromDirectory
 > Return list of files in a directory
 
+:   getMediaThumbnailFromFile
+> Get image or video thumbnail from a file
 
-GlobalMediaUtils Class
-----------
+:   deleteFile
+> Delete a file
 
-:   getMediaThumbnail
-> Get image or video thumbnail
+:   getFileNameFromURL
+> Get file name from url
 
 
 # License

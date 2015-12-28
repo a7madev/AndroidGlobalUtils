@@ -6,16 +6,21 @@ import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -255,6 +260,55 @@ public class GlobalUtils implements GlobalUtilsInterface {
         // dismiss the loading dialog
         if(progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
+        }
+    }
+
+    /**
+     * Get Bitmap by Resource ID
+     * @param context  The context to use. Use application or activity context
+     * @param resID  resource ID: R.drawable.image
+     * @return Bitmap bitmap object
+     */
+    public static Bitmap getBitmapByResourceID(Context context, int resID) {
+        return BitmapFactory.decodeResource(context.getResources(), resID);
+    }
+
+    /**
+     * Opens share file intent
+     * @param context  The context to use. Use application or activity context
+     * @param file file object to be opened
+     * @param shareMessage Show message appears in share dialog
+     */
+    public static void openShareFileIntent(Context context, File file, String shareMessage) {
+        try {
+            Uri fileURI = Uri.fromFile(file);
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_STREAM, fileURI);
+            shareIntent.setType(GlobalFileUtils.getMimeType(context, fileURI));
+            context.startActivity(Intent.createChooser(shareIntent, shareMessage));
+        } catch (Exception e) {
+            GlobalUtils.logThis(TAG, "openShareFileIntent Exception", e);
+        }
+    }
+
+    /**
+     * Open share text intent
+     * @param context  The context to use. Use application or activity context
+     * @param stringTitle Title
+     * @param stringContent Content
+     * @param shareMessage Show message appears in share dialog
+     */
+    public static void openShareTextIntent(Context context, String stringTitle, String stringContent, String shareMessage) {
+        try {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, stringContent);
+            sendIntent.putExtra(Intent.EXTRA_TITLE, stringTitle);
+            sendIntent.setType("text/plain");
+            context.startActivity(Intent.createChooser(sendIntent, shareMessage));
+        } catch (Exception e) {
+            GlobalUtils.logThis(TAG, "openShareTextIntent Exception", e);
         }
     }
 }

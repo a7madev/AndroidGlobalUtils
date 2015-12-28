@@ -3,7 +3,11 @@ package me.a7madev.androidglobalutils;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.provider.MediaStore;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
@@ -101,5 +105,71 @@ public class GlobalFileUtils {
             }
         }
         return fileList;
+    }
+
+    /**
+     * Get image or video thumbnail from a file
+     * @param file  Image
+     * @return Bitmap bitmap object
+     */
+    public static Bitmap getMediaThumbnailFromFile(Context context, File file) {
+
+        Bitmap thumbBitmap;
+
+        // get video thumbnail
+        thumbBitmap = ThumbnailUtils.createVideoThumbnail(file.getPath(), MediaStore.Video.Thumbnails.MICRO_KIND);
+
+        // get image thumbnail
+        if(thumbBitmap == null){
+            thumbBitmap = ThumbnailUtils.createVideoThumbnail(file.getPath(), MediaStore.Images.Thumbnails.MICRO_KIND);
+        }
+
+        // create a thumbnail
+        if(thumbBitmap == null){
+            File image = new File(Uri.fromFile(file).getPath());
+
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(image.getPath(), bounds);
+            if ((bounds.outWidth == -1) || (bounds.outHeight == -1))
+                return null;
+
+            int originalSize = (bounds.outHeight > bounds.outWidth) ? bounds.outHeight
+                    : bounds.outWidth;
+
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inSampleSize = originalSize / 256;
+            return BitmapFactory.decodeFile(image.getPath(), opts);
+        }
+        return thumbBitmap;
+    }
+
+    /**
+     * Delete a file
+     * @param file File to be deleted
+     * @return boolean file is deleted?
+     */
+    public static boolean deleteFile(File file) {
+        boolean fileDeleted = false;
+        try {
+            if(file != null && file.exists()){
+                fileDeleted = file.delete();
+            }
+        } catch (Exception e) {
+            GlobalUtils.logThis(TAG, "deleteFile Exception", e);
+        }
+        return fileDeleted;
+    }
+
+    /**
+     * Get file name from url
+     * @param url link
+     * @return String file name
+     */
+    public static String getFileNameFromURL(String url) {
+        if(url != null && !url.isEmpty()){
+            return url.substring( url.lastIndexOf('/')+1, url.length() );
+        }
+        return "unnamed";
     }
 }
