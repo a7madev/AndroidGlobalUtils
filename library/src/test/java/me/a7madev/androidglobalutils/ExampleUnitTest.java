@@ -2,6 +2,8 @@ package me.a7madev.androidglobalutils;
 
 import org.junit.Test;
 
+import me.a7madev.androidglobalutils.GlobalUtils;
+
 import static org.junit.Assert.*;
 
 /**

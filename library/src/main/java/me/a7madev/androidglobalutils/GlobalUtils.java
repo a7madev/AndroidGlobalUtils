@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GlobalUtils {
+public class GlobalUtils implements GlobalUtilsInterface {
 
     public static final String TAG = GlobalUtils.class.getSimpleName();
 
@@ -245,5 +245,16 @@ public class GlobalUtils {
             logThis(TAG, "initProgressDialog Exception", e);
         }
         return loadingDialog;
+    }
+
+    /**
+     * Dismiss Progress Dialog
+     * @param progressDialog  Progress Dialog object
+     */
+    public static void dismissProgressDialog(ProgressDialog progressDialog) {
+        // dismiss the loading dialog
+        if(progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
     }
 }

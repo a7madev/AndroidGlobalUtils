@@ -126,3 +126,4 @@ _book
 *.epub
 *.mobi
 *.pdf
+/bintrayUpload.bat
