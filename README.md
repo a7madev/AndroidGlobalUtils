@@ -1,3 +1,6 @@
+[ ![Download](https://api.bintray.com/packages/a7madev/maven/AndroidGlobalUtils/images/download.svg) ](https://bintray.com/a7madev/maven/AndroidGlobalUtils/_latestVersion)
+[![Android Arsenal](https://img.shields.io/badge/Android%20Arsenal-AndroidGlobalUtils-green.svg?style=true)](https://android-arsenal.com/details/1/2969)
+
 AndroidGlobalUtils
 ===================
 
@@ -12,7 +15,7 @@ Global Utilities for Android
 #### Step 1: Add to project build.gradle
 
     dependencies {
-        compile 'me.a7madev.androidglobalutils:library:1.0.4'
+        compile 'me.a7madev.androidglobalutils:library:1.+'
     }
 
 #### Step 2: Import package in your java class
@@ -60,15 +63,59 @@ GlobalUtils Class
 :  initProgressDialog
 > Initialize Progress Dialog
 
+:  dismissProgressDialog
+> Dismiss Progress Dialog
+
+:  getBitmapByResourceID
+> Get Bitmap by Resource ID
+
+:  openShareFileIntent
+> Opens share file intent
+
+:  openShareTextIntent
+> Open share text intent
+
+:  openCallIntent
+> Open call intent
+
+:  openURLIntent
+> Open URL intent
+
+:  openEmailIntent
+> Open Email intent
+
 GlobalFileUtils Class
 ----------
-
-:   openFileIntent
-> Open File using intent
 
 :   getMimeType
 > Get File Mime Type
 
+:   openFileIntent
+> Open File using intent (starts activity)
+
+:   getFileIntent
+> Return Intent to open any files
+
+:   getFilesListFromDirectory
+> Return list of files in a directory
+
+:   getMediaThumbnailFromFile
+> Get image or video thumbnail from a file
+
+:   deleteFile
+> Delete a file
+
+:   getFileNameFromURL
+> Get file name from url
+
+:   getStorageDirectory
+> Get Storage Directory, if does not exist, return download directory
+
+:   isExternalStorageWritable
+> Checks if external storage is available for read and write
+
+:   isExternalStorageReadable
+> Checks if external storage is available to at least read
 
 
 # License

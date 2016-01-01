@@ -1,19 +1,11 @@
 language: android
-jdk: oraclejdk7
-# Turn off caching to avoid any caching problems
-cache: false
-# Use the Travis Container-Based Infrastructure
 sudo: false
-env:
-  global:
-    - ANDROID_API_LEVEL=23
-    - ANDROID_BUILD_TOOLS_VERSION=23.0.2
-    - ANDROID_ABI=armeabi-v7a
-    - ADB_INSTALL_TIMEOUT=8 # minutes (2 minutes by default)
-
+jdk: openjdk7
 android:
   components:
-    - platform-tools
-    - tools
-    - build-tools-$ANDROID_BUILD_TOOLS_VERSION
-    - android-$ANDROID_API_LEVEL
+    - build-tools-23.0.2
+    - extra-android-support
+    - extra-android-m2repository
+    - android-23
+  licenses:
+    - '.+'

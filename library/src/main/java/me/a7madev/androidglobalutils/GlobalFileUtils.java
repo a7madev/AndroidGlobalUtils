@@ -3,31 +3,20 @@ package me.a7madev.androidglobalutils;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.webkit.MimeTypeMap;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class GlobalFileUtils {
 
     public static final String TAG = GlobalFileUtils.class.getSimpleName();
-
-    /**
-     * Open File using intent
-     * @param context  The context to use. Use application or activity context
-     * @param file file object to be opened
-     */
-    public static void openFileIntent(Context context, File file) {
-        if(context != null && file.exists()) {
-            try {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(file), getMimeType(context, Uri.fromFile(file)));
-                context.startActivity(intent);
-            } catch (Exception e) {
-                GlobalUtils.logThis(TAG, "openFileIntent Exception", e);
-            }
-        }
-    }
 
     /**
      * Get File Mime Type
@@ -52,4 +41,184 @@ public class GlobalFileUtils {
         return mimeType;
     }
 
+    /**
+     * Open File using intent
+     * @param context  The context to use. Use application or activity context
+     * @param openFile file object to be opened
+     */
+
+    public static void openFileIntent(Context context, File openFile) {
+        if(context != null && openFile.exists()) {
+            try {
+                Intent intent = getFileIntent(context, openFile);
+                context.startActivity(intent);
+            } catch (Exception e) {
+                GlobalUtils.logThis(TAG, "openFileIntent Exception", e);
+            }
+        }
+    }
+
+    /**
+     * Return Intent to open any files
+     * @param context  The context to use. Use application or activity context
+     * @param openFile file object to be opened
+     */
+    public static Intent getFileIntent(Context context, File openFile) {
+        Intent fileIntent = null;
+        if(context != null && openFile.exists()) {
+            try {
+                fileIntent = new Intent(Intent.ACTION_VIEW);
+                fileIntent.setDataAndType(Uri.fromFile(openFile), getMimeType(context, Uri.fromFile(openFile)));
+            } catch (Exception e) {
+                GlobalUtils.logThis(TAG, "getFileIntent Exception", e);
+            }
+        }
+        return fileIntent;
+    }
+
+
+    /**
+     * Return list of files in a directory
+     * @param dir  directory as File
+     * @param acceptExtensions include all extensions to be listed: .png, .jpg, .mp4
+     * @param includeDirectory include directory in the list?
+     * @return Array list of files
+     */
+    public static ArrayList<File> getFilesListFromDirectory(File dir, String[] acceptExtensions, boolean includeDirectory) {
+        ArrayList<File> fileList = new ArrayList<>();
+        File listFile[] = dir.listFiles();
+        if (listFile != null && listFile.length > 0) {
+            for (File aListFile : listFile) {
+                if (aListFile.isDirectory()) {
+                    if(includeDirectory){
+                        fileList.add(aListFile);
+                    }
+                    getFilesListFromDirectory(aListFile, acceptExtensions, includeDirectory);
+                } else {
+                    if(acceptExtensions != null && acceptExtensions.length > 0){
+                        for (String ext : acceptExtensions){
+                            if (aListFile.getName().endsWith(ext)) {
+                                fileList.add(aListFile);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return fileList;
+    }
+
+    /**
+     * Get image or video thumbnail from a file
+     * @param file  Image
+     * @return Bitmap bitmap object
+     */
+    public static Bitmap getMediaThumbnailFromFile(Context context, File file) {
+
+        Bitmap thumbBitmap;
+
+        // get video thumbnail
+        thumbBitmap = ThumbnailUtils.createVideoThumbnail(file.getPath(), MediaStore.Video.Thumbnails.MICRO_KIND);
+
+        // get image thumbnail
+        if(thumbBitmap == null){
+            thumbBitmap = ThumbnailUtils.createVideoThumbnail(file.getPath(), MediaStore.Images.Thumbnails.MICRO_KIND);
+        }
+
+        // create a thumbnail
+        if(thumbBitmap == null){
+            File image = new File(Uri.fromFile(file).getPath());
+
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            BitmapFactory.decodeFile(image.getPath(), bounds);
+            if ((bounds.outWidth == -1) || (bounds.outHeight == -1))
+                return null;
+
+            int originalSize = (bounds.outHeight > bounds.outWidth) ? bounds.outHeight
+                    : bounds.outWidth;
+
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inSampleSize = originalSize / 256;
+            return BitmapFactory.decodeFile(image.getPath(), opts);
+        }
+        return thumbBitmap;
+    }
+
+    /**
+     * Delete a file
+     * @param file File to be deleted
+     * @return boolean file is deleted?
+     */
+    public static boolean deleteFile(File file) {
+        boolean fileDeleted = false;
+        try {
+            if(file != null && file.exists()){
+                fileDeleted = file.delete();
+            }
+        } catch (Exception e) {
+            GlobalUtils.logThis(TAG, "deleteFile Exception", e);
+        }
+        return fileDeleted;
+    }
+
+    /**
+     * Get file name from url
+     * @param url link
+     * @return String file name
+     */
+    public static String getFileNameFromURL(String url) {
+        if(url != null && !url.isEmpty()){
+            return url.substring(url.lastIndexOf('/') + 1, url.length());
+        }
+        return "unnamed";
+    }
+
+
+    /**
+     * Get Storage Directory, if doesnt exist, return download directory
+     * @param directoryName Your directory name
+     * @return File File object
+     */
+    public static File getStorageDirectory(String directoryName) {
+
+        File downloadsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+
+        File appFolder = new File(Environment.getExternalStorageDirectory(), "/" + directoryName);
+
+        boolean success = false;
+
+        if (!appFolder.exists()) {
+            if(appFolder.mkdirs()){
+                success = true;
+            }
+        }else{
+            success = true;
+        }
+
+        if (success) {
+            return appFolder;
+        } else {
+            return downloadsFolder;
+        }
+    }
+
+    /**
+     * Checks if external storage is available for read and write
+     * @return Boolean
+     */
+    public static boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
+    }
+
+    /**
+     * Checks if external storage is available to at least read
+     * @return Boolean
+     */
+    public boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
+    }
 }

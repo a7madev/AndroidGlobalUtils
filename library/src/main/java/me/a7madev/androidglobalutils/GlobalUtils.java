@@ -1,26 +1,34 @@
 package me.a7madev.androidglobalutils;
 
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.Build;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GlobalUtils {
+public class GlobalUtils implements GlobalUtilsInterface {
 
     public static final String TAG = GlobalUtils.class.getSimpleName();
 
@@ -245,5 +253,121 @@ public class GlobalUtils {
             logThis(TAG, "initProgressDialog Exception", e);
         }
         return loadingDialog;
+    }
+
+    /**
+     * Dismiss Progress Dialog
+     * @param progressDialog  Progress Dialog object
+     */
+    public static void dismissProgressDialog(ProgressDialog progressDialog) {
+        // dismiss the loading dialog
+        if(progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+    }
+
+    /**
+     * Get Bitmap by Resource ID
+     * @param context  The context to use. Use application or activity context
+     * @param resID  resource ID: R.drawable.image
+     * @return Bitmap bitmap object
+     */
+    public static Bitmap getBitmapByResourceID(Context context, int resID) {
+        return BitmapFactory.decodeResource(context.getResources(), resID);
+    }
+
+    /**
+     * Opens share file intent
+     * @param context  The context to use. Use application or activity context
+     * @param file file object to be opened
+     * @param shareMessage Show message appears in share dialog
+     */
+    public static void openShareFileIntent(Context context, File file, String shareMessage) {
+        try {
+            Uri fileURI = Uri.fromFile(file);
+            Intent shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_STREAM, fileURI);
+            shareIntent.setType(GlobalFileUtils.getMimeType(context, fileURI));
+            context.startActivity(Intent.createChooser(shareIntent, shareMessage));
+        } catch (Exception e) {
+            GlobalUtils.logThis(TAG, "openShareFileIntent Exception", e);
+        }
+    }
+
+    /**
+     * Open share text intent
+     * @param context  The context to use. Use application or activity context
+     * @param stringTitle Title
+     * @param stringContent Content
+     * @param shareDialogTitle Show message appears in share dialog
+     */
+    public static void openShareTextIntent(Context context, String stringTitle, String stringContent, String shareDialogTitle) {
+        try {
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, stringContent);
+            sendIntent.putExtra(Intent.EXTRA_TITLE, stringTitle);
+            sendIntent.setType("text/plain");
+            context.startActivity(Intent.createChooser(sendIntent, shareDialogTitle));
+        } catch (Exception e) {
+            GlobalUtils.logThis(TAG, "openShareTextIntent Exception", e);
+        }
+    }
+
+    /**
+     * Open call intent
+     * @param activity  Fragment activity
+     * @param phoneNumber Phone number
+     * @param codeRequest Permission request (onActivityResult) if required
+     */
+    public static void openCallIntent(Activity activity, String phoneNumber, int codeRequest) {
+        try {
+            Intent callIntent = new Intent(Intent.ACTION_CALL);
+            callIntent.setData(Uri.parse(phoneNumber));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // Android M+ Check Permission
+                if (ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
+                    activity.startActivity(callIntent);
+                }else{
+                    GlobalUtils.requestMultiplePermissions(activity, new String[]{Manifest.permission.CALL_PHONE}, codeRequest);
+                }
+            }else{ // Android Pre-M
+                activity.startActivity(callIntent);
+            }
+        } catch (ActivityNotFoundException e) {
+            GlobalUtils.logThis(TAG, "Calling failed", e);
+        }
+    }
+
+    /**
+     * Open URL Intent
+     * @param context  The context to use. Use application or activity context
+     * @param link Website Link
+     */
+    public static void openURLIntent(Context context, String link) {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+            context.startActivity(intent);
+        } catch (Exception e) {
+            GlobalUtils.logThis(TAG, "Unable to open website!", e);
+        }
+    }
+
+    /**
+     * Open Email Intent
+     * @param context  The context to use. Use application or activity context
+     * @param emailAddress To Email Address
+     * @param emailSubject Email Subject
+     */
+    public static void openEmailIntent(Context context, String emailAddress, String emailSubject) {
+        try {
+            Intent emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{emailAddress});
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, emailSubject);
+            emailIntent.setType("message/rfc822");
+            context.startActivity(Intent.createChooser(emailIntent, "Choose an Email client:"));
+        } catch (Exception e) {
+            GlobalUtils.logThis(TAG, "Unable to open email application!", e);
+        }
     }
 }

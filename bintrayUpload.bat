@@ -1,0 +1,3 @@
+gradlew install
+gradlew bintrayUpload
+PAUSE
