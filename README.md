@@ -15,7 +15,7 @@ Global Utilities for Android
 #### Step 1: Add to project build.gradle
 
     dependencies {
-        compile 'me.a7madev.androidglobalutils:library:1.+'
+            compile 'me.a7madev.androidglobalutils:library:1.0.11'
     }
 
 #### Step 2: Import package in your java class
@@ -69,17 +69,32 @@ GlobalUtils Class
 :  getBitmapByResourceID
 > Get Bitmap by Resource ID
 
+:  getShareFileIntent
+> Return share file intent
+
 :  openShareFileIntent
 > Opens share file intent
 
-:  openShareTextIntent
+:  getShareTextIntent
+> Get share text intent:  
+
+openShareTextIntent
 > Open share text intent
 
-:  openCallIntent
+:  getCallIntent
+> Get call intent: 
+ 
+ openCallIntent
 > Open call intent
+
+:  getURLIntent
+> Get URL intent:  
 
 :  openURLIntent
 > Open URL intent
+
+:  getnEmailIntent
+> Get Email intent
 
 :  openEmailIntent
 > Open Email intent

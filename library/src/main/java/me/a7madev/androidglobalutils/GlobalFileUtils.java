@@ -181,19 +181,25 @@ public class GlobalFileUtils {
      * @return File File object
      */
     public static File getStorageDirectory(String directoryName) {
-
-        File downloadsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
-
-        File appFolder = new File(Environment.getExternalStorageDirectory(), "/" + directoryName);
-
+        File downloadsFolder = null, appFolder = null;
         boolean success = false;
 
-        if (!appFolder.exists()) {
-            if(appFolder.mkdirs()){
+        try {
+
+            downloadsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).getAbsolutePath());
+
+            appFolder = new File(Environment.getExternalStorageDirectory(), "/" + directoryName);
+
+            if (!appFolder.exists()) {
+                if(appFolder.mkdirs()){
+                    success = true;
+                }
+            }else{
                 success = true;
             }
-        }else{
-            success = true;
+
+        } catch (Exception e) {
+            GlobalUtils.logThis(TAG, "getStorageDirectory ActivityNotFoundException", e);
         }
 
         if (success) {

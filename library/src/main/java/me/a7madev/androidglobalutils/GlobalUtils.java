@@ -194,7 +194,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
             ClipData.Item item = clipboard.getPrimaryClip().getItemAt(0);
             pasteData = item.getText().toString();
         } catch (Exception e) {
-            GlobalUtils.logThis(TAG, "getContentFromClipboard Exception", e);
+            logThis(TAG, "getContentFromClipboard Exception", e);
         }
 
         return pasteData;
@@ -209,21 +209,25 @@ public class GlobalUtils implements GlobalUtilsInterface {
      */
     @TargetApi(Build.VERSION_CODES.M)
     public static void requestMultiplePermissions(Activity activity, String[] permissionsList, int requestCode) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // init permissions list
-            List<String> permissions = new ArrayList<>();
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                // init permissions list
+                List<String> permissions = new ArrayList<>();
 
-            // loop through permissions
-            for (String permission : permissionsList) {
-                if (activity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-                    permissions.add(permission);
+                // loop through permissions
+                for (String permission : permissionsList) {
+                    if (activity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+                        permissions.add(permission);
+                    }
+                }
+
+                // if permissions list is not empty, request permission
+                if (!permissions.isEmpty()) {
+                    activity.requestPermissions(permissions.toArray(new String[permissions.size()]), requestCode);
                 }
             }
-
-            // if permissions list is not empty, request permission
-            if (!permissions.isEmpty()) {
-                activity.requestPermissions(permissions.toArray(new String[permissions.size()]), requestCode);
-            }
+        } catch (Exception e) {
+            logThis(TAG, "requestMultiplePermissions Exception", e);
         }
     }
 
@@ -261,8 +265,12 @@ public class GlobalUtils implements GlobalUtilsInterface {
      */
     public static void dismissProgressDialog(ProgressDialog progressDialog) {
         // dismiss the loading dialog
-        if(progressDialog != null && progressDialog.isShowing()) {
-            progressDialog.dismiss();
+        try {
+            if(progressDialog != null && progressDialog.isShowing()) {
+                progressDialog.dismiss();
+            }
+        } catch (Exception e) {
+            logThis(TAG, "dismissProgressDialog Exception", e);
         }
     }
 
@@ -276,23 +284,58 @@ public class GlobalUtils implements GlobalUtilsInterface {
         return BitmapFactory.decodeResource(context.getResources(), resID);
     }
 
+
+    /**
+     * Get share file intent
+     * @param context  The context to use. Use application or activity context
+     * @param file file object to be opened
+     * @return Intent
+     */
+    public static Intent getShareFileIntent(Context context, File file) {
+        Intent shareIntent = null;
+        try {
+            Uri fileURI = Uri.fromFile(file);
+            shareIntent = new Intent();
+            shareIntent.setAction(Intent.ACTION_SEND);
+            shareIntent.putExtra(Intent.EXTRA_STREAM, fileURI);
+            shareIntent.setType(GlobalFileUtils.getMimeType(context, fileURI));
+        } catch (Exception e) {
+            logThis(TAG, "getShareFileIntent Exception", e);
+        }
+        return shareIntent;
+    }
+
     /**
      * Opens share file intent
      * @param context  The context to use. Use application or activity context
      * @param file file object to be opened
-     * @param shareMessage Show message appears in share dialog
+     * @param shareDialogMessage Show message appears in share dialog
      */
-    public static void openShareFileIntent(Context context, File file, String shareMessage) {
+    public static void openShareFileIntent(Context context, File file, String shareDialogMessage) {
         try {
-            Uri fileURI = Uri.fromFile(file);
-            Intent shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, fileURI);
-            shareIntent.setType(GlobalFileUtils.getMimeType(context, fileURI));
-            context.startActivity(Intent.createChooser(shareIntent, shareMessage));
+            context.startActivity(Intent.createChooser(getShareFileIntent(context, file), shareDialogMessage));
         } catch (Exception e) {
-            GlobalUtils.logThis(TAG, "openShareFileIntent Exception", e);
+            logThis(TAG, "openShareFileIntent Exception", e);
         }
+    }
+
+    /**
+     * Get share text intent
+     * @param stringTitle Title
+     * @param stringContent Content
+     */
+    public static Intent getShareTextIntent(String stringTitle, String stringContent) {
+        Intent sendIntent = null;
+        try {
+            sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT, stringContent);
+            sendIntent.putExtra(Intent.EXTRA_TITLE, stringTitle);
+            sendIntent.setType("text/plain");
+        } catch (Exception e) {
+            logThis(TAG, "getShareTextIntent Exception", e);
+        }
+        return sendIntent;
     }
 
     /**
@@ -304,15 +347,26 @@ public class GlobalUtils implements GlobalUtilsInterface {
      */
     public static void openShareTextIntent(Context context, String stringTitle, String stringContent, String shareDialogTitle) {
         try {
-            Intent sendIntent = new Intent();
-            sendIntent.setAction(Intent.ACTION_SEND);
-            sendIntent.putExtra(Intent.EXTRA_TEXT, stringContent);
-            sendIntent.putExtra(Intent.EXTRA_TITLE, stringTitle);
-            sendIntent.setType("text/plain");
-            context.startActivity(Intent.createChooser(sendIntent, shareDialogTitle));
+            context.startActivity(Intent.createChooser(getShareTextIntent(stringTitle, stringContent), shareDialogTitle));
         } catch (Exception e) {
-            GlobalUtils.logThis(TAG, "openShareTextIntent Exception", e);
+            logThis(TAG, "openShareTextIntent Exception", e);
         }
+    }
+
+    /**
+     * Get call intent
+     * @param phoneNumber Phone number
+     * @return  Intent
+     */
+    public static Intent getCallIntent(String phoneNumber) {
+        Intent callIntent = null;
+        try {
+            callIntent = new Intent(Intent.ACTION_CALL);
+            callIntent.setData(Uri.parse(phoneNumber));
+        } catch (ActivityNotFoundException e) {
+            logThis(TAG, "getCallIntent ActivityNotFoundException", e);
+        }
+        return callIntent;
     }
 
     /**
@@ -323,20 +377,36 @@ public class GlobalUtils implements GlobalUtilsInterface {
      */
     public static void openCallIntent(Activity activity, String phoneNumber, int codeRequest) {
         try {
-            Intent callIntent = new Intent(Intent.ACTION_CALL);
-            callIntent.setData(Uri.parse(phoneNumber));
+            Intent callIntent = getCallIntent(phoneNumber);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) { // Android M+ Check Permission
                 if (ActivityCompat.checkSelfPermission(activity, android.Manifest.permission.CALL_PHONE) == PackageManager.PERMISSION_GRANTED) {
                     activity.startActivity(callIntent);
                 }else{
-                    GlobalUtils.requestMultiplePermissions(activity, new String[]{Manifest.permission.CALL_PHONE}, codeRequest);
+                    requestMultiplePermissions(activity, new String[]{Manifest.permission.CALL_PHONE}, codeRequest);
                 }
             }else{ // Android Pre-M
                 activity.startActivity(callIntent);
             }
         } catch (ActivityNotFoundException e) {
-            GlobalUtils.logThis(TAG, "Calling failed", e);
+            logThis(TAG, "openCallIntent ActivityNotFoundException", e);
         }
+    }
+
+    /**
+     * Get URL Intent
+     * @param url Website Link
+     * @return Intent
+     */
+    public static Intent getURLIntent(String url) {
+        Intent intent = null;
+        try {
+            if(url != null && !url.isEmpty()){
+                intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+            }
+        } catch (Exception e) {
+            logThis(TAG, "getURLIntent Exception", e);
+        }
+        return intent;
     }
 
     /**
@@ -346,28 +416,44 @@ public class GlobalUtils implements GlobalUtilsInterface {
      */
     public static void openURLIntent(Context context, String link) {
         try {
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
-            context.startActivity(intent);
+            context.startActivity(getURLIntent(link));
         } catch (Exception e) {
-            GlobalUtils.logThis(TAG, "Unable to open website!", e);
+            logThis(TAG, "Unable to open website!", e);
         }
     }
+
+    /**
+     * Get Email Intent
+     * @param emailAddress To Email Address
+     * @param emailSubject Email Subject
+     * @return Intent
+     */
+    public static Intent getnEmailIntent(String emailAddress, String emailSubject) {
+        Intent emailIntent = null;
+        try {
+            emailIntent = new Intent(Intent.ACTION_SEND);
+            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{emailAddress});
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, emailSubject);
+            emailIntent.setType("message/rfc822");
+        } catch (Exception e) {
+            logThis(TAG, "getnEmailIntent Exception", e);
+        }
+        return emailIntent;
+    }
+
 
     /**
      * Open Email Intent
      * @param context  The context to use. Use application or activity context
      * @param emailAddress To Email Address
      * @param emailSubject Email Subject
+     * @param dialogMessage Dialog message (Example: Choose an email client:)
      */
-    public static void openEmailIntent(Context context, String emailAddress, String emailSubject) {
+    public static void openEmailIntent(Context context, String emailAddress, String emailSubject, String dialogMessage) {
         try {
-            Intent emailIntent = new Intent(Intent.ACTION_SEND);
-            emailIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{emailAddress});
-            emailIntent.putExtra(Intent.EXTRA_SUBJECT, emailSubject);
-            emailIntent.setType("message/rfc822");
-            context.startActivity(Intent.createChooser(emailIntent, "Choose an Email client:"));
+            context.startActivity(Intent.createChooser(getnEmailIntent(emailAddress, emailSubject), dialogMessage));
         } catch (Exception e) {
-            GlobalUtils.logThis(TAG, "Unable to open email application!", e);
+            logThis(TAG, "openEmailIntent Exception", e);
         }
     }
 }
