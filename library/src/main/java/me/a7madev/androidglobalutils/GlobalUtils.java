@@ -456,4 +456,18 @@ public class GlobalUtils implements GlobalUtilsInterface {
             logThis(TAG, "openEmailIntent Exception", e);
         }
     }
+
+
+    /**
+     * Change Activity Theme
+     * @param activity  Activity Content
+     * @param styleID Style ID: R.style.theme
+     */
+    public static void changeActivityTheme(Activity activity, int styleID) {
+        try {
+            activity.setTheme(styleID);
+        } catch (Exception e) {
+            logThis(TAG, "changeActivityTheme Exception", e);
+        }
+    }
 }

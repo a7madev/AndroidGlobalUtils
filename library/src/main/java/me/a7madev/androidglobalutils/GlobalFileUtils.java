@@ -86,19 +86,21 @@ public class GlobalFileUtils {
      */
     public static ArrayList<File> getFilesListFromDirectory(File dir, String[] acceptExtensions, boolean includeDirectory) {
         ArrayList<File> fileList = new ArrayList<>();
-        File listFile[] = dir.listFiles();
-        if (listFile != null && listFile.length > 0) {
-            for (File aListFile : listFile) {
-                if (aListFile.isDirectory()) {
-                    if(includeDirectory){
-                        fileList.add(aListFile);
-                    }
-                    getFilesListFromDirectory(aListFile, acceptExtensions, includeDirectory);
-                } else {
-                    if(acceptExtensions != null && acceptExtensions.length > 0){
-                        for (String ext : acceptExtensions){
-                            if (aListFile.getName().endsWith(ext)) {
-                                fileList.add(aListFile);
+        if(dir != null && dir.exists()) {
+            File listFile[] = dir.listFiles();
+            if (listFile != null && listFile.length > 0) {
+                for (File aListFile : listFile) {
+                    if (aListFile.isDirectory()) {
+                        if (includeDirectory) {
+                            fileList.add(aListFile);
+                        }
+                        getFilesListFromDirectory(aListFile, acceptExtensions, includeDirectory);
+                    } else {
+                        if (acceptExtensions != null && acceptExtensions.length > 0) {
+                            for (String ext : acceptExtensions) {
+                                if (aListFile.getName().endsWith(ext)) {
+                                    fileList.add(aListFile);
+                                }
                             }
                         }
                     }

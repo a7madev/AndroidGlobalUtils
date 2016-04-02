@@ -15,7 +15,7 @@ Global Utilities for Android
 #### Step 1: Add to project build.gradle
 
     dependencies {
-            compile 'me.a7madev.androidglobalutils:library:1.0.11'
+            compile 'me.a7madev.androidglobalutils:library:1.0.12'
     }
 
 #### Step 2: Import package in your java class
@@ -78,7 +78,7 @@ GlobalUtils Class
 :  getShareTextIntent
 > Get share text intent:  
 
-openShareTextIntent
+: openShareTextIntent
 > Open share text intent
 
 :  getCallIntent
@@ -98,6 +98,9 @@ openShareTextIntent
 
 :  openEmailIntent
 > Open Email intent
+
+:  changeActivityTheme
+> Change Activity Theme
 
 GlobalFileUtils Class
 ----------
