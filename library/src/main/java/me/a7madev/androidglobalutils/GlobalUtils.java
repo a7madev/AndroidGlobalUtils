@@ -21,12 +21,20 @@ import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
+import org.joda.time.DateTime;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
+import java.util.UUID;
 
 public class GlobalUtils implements GlobalUtilsInterface {
 
@@ -470,4 +478,77 @@ public class GlobalUtils implements GlobalUtilsInterface {
             logThis(TAG, "changeActivityTheme Exception", e);
         }
     }
+
+    /**
+     * Load image
+     * @param context  Activity Content
+     * @param url Image url or null
+     * @param placeHolder Image placeholder: R.id.image or 0
+     * @param error Image error: R.id.image or 0
+     * @param imageView Image View
+     */
+    public static void loadImage(Context context, String url, int placeHolder, int error, ImageView imageView) {
+        try {
+            if (context != null) {
+                if (imageView != null) {
+                    if (url != null && !url.isEmpty()) {
+                        if (placeHolder != 0) {
+                            Glide.with(context).load(url).diskCacheStrategy(DiskCacheStrategy.ALL).placeholder(placeHolder).into(imageView);
+                        } else {
+                            Glide.with(context).load(url).diskCacheStrategy(DiskCacheStrategy.ALL).into(imageView);
+                        }
+                    } else {
+                        Glide.with(context).load(placeHolder).into(imageView);
+                    }
+                } else {
+                    Glide.with(context).load(url).diskCacheStrategy(DiskCacheStrategy.ALL);
+                }
+            }
+        } catch (Exception e) {
+            logThis(TAG, "loadImage Exception", e);
+        }
+    }
+
+    /**
+     * Generate UUID
+     */
+    public static String generateUUID() {
+        return UUID.randomUUID().toString();
+    }
+
+    /**
+     * Today's Timestamp
+     */
+    public static String todayTimestamp() {
+        DateTime dateTimeNow = DateTime.now();
+        return createDateTimeString(getTwoDigitsInt(dateTimeNow.getYear()), getTwoDigitsInt(dateTimeNow.getMonthOfYear()), getTwoDigitsInt(dateTimeNow.getDayOfMonth()), true);
+    }
+
+    /**
+     * Create Date Time String
+     */
+    public static String createDateTimeString(String year, String month, String day, boolean midnight) {
+        String time = "00:00:00";
+
+        if (!midnight) {
+            time = "11:59:59";
+        }
+
+        return year + "-" + month + "-" + day + "T" + time;
+    }
+
+    /**
+     * Get Two Digits Integer
+     */
+    public static String getTwoDigitsInt(int num) {
+        return String.format(Locale.US,"%02d", num);
+    }
+
+    /**
+     * Validate the text
+     */
+    public static boolean validateText(String text) {
+        return text != null && !text.isEmpty();
+    }
+
 }
