@@ -2,14 +2,14 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    compileSdkVersion 25
+    buildToolsVersion "25.0.1"
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 24
-        versionCode 1013
-        versionName "1.0.13"
+        targetSdkVersion 25
+        versionCode 1014
+        versionName "1.0.14"
     }
     buildTypes {
         release {
@@ -20,11 +20,11 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:24.2.0'
-    compile 'com.android.support:appcompat-v7:24.2.0'
-    compile 'com.android.support:design:24.2.0'
+    compile 'com.android.support:support-v4:25.0.1'
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.android.support:design:25.0.1'
     compile 'com.github.bumptech.glide:glide:3.7.0'
-    compile 'net.danlew:android.joda:2.9.4.1'
+    compile 'net.danlew:android.joda:2.9.5.1'
 }
 
 ext {
@@ -41,7 +41,7 @@ ext {
     artifact = 'library'
 
     libraryDescription = 'Android Global Utilities Library'
-    libraryVersion = '1.0.13'
+    libraryVersion = '1.0.14'
 
     developerId = 'a7madev'
     developerName = 'A7maDev'
