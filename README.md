@@ -102,6 +102,36 @@ GlobalUtils Class
 :  changeActivityTheme
 > Change Activity Theme
 
+:  loadImage
+> Load image using Glide
+
+:  generateUUID
+> Generate UUID
+
+: todayTimestamp
+> Generate Today Timestamp
+
+:  createDateTimeString
+> Create Date Time String
+
+:  getTwoDigitsInt
+> Get Two Digits Integer
+
+:  validateText
+> Validate Text
+
+:  getDisplaySize
+> Get Display Size
+
+:  getDisplayDensity
+> Get Display Density
+
+:  convertDpToPx
+> Convert DP to PX
+
+:  convertPxToDp
+> Convert PX to DP
+
 GlobalFileUtils Class
 ----------
 

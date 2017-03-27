@@ -14,13 +14,16 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Point;
 import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.ActivityCompat;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Window;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -80,10 +83,14 @@ public class GlobalUtils implements GlobalUtilsInterface {
 
         // validate message
         if(message != null) {
-            if (inDebugOnly && isDebug()) { // show only in debug config
-                Toast.makeText(context, message, duration).show();
-            } else if (!inDebugOnly) { // show in debug and release configs
-                Toast.makeText(context, message, duration).show();
+            try {
+                if (inDebugOnly && isDebug()) { // show only in debug config
+                    Toast.makeText(context, message, duration).show();
+                } else if (!inDebugOnly) { // show in debug and release configs
+                    Toast.makeText(context, message, duration).show();
+                }
+            } catch (Exception e) {
+                logThis(TAG, "showToast Exception", e);
             }
         }
     }
@@ -526,6 +533,11 @@ public class GlobalUtils implements GlobalUtilsInterface {
 
     /**
      * Create Date Time String
+     * @param year String
+     * @param month String
+     * @param day String
+     * @param midnight boolean, if true returns time 00:00, otherwise 11:59
+     * @return String two digits
      */
     public static String createDateTimeString(String year, String month, String day, boolean midnight) {
         String time = "00:00:00";
@@ -539,6 +551,8 @@ public class GlobalUtils implements GlobalUtilsInterface {
 
     /**
      * Get Two Digits Integer
+     * @param num integer number
+     * @return String two digits
      */
     public static String getTwoDigitsInt(int num) {
         return String.format(Locale.US,"%02d", num);
@@ -546,9 +560,70 @@ public class GlobalUtils implements GlobalUtilsInterface {
 
     /**
      * Validate the text
+     * @param text String
+     * @return boolean if text is not null & not empty
      */
     public static boolean validateText(String text) {
         return text != null && !text.isEmpty();
     }
 
+    /**
+     * Get Display Size
+     * @param activity Activity
+     * @return String Size and SDK Number
+     */
+    public static String getDisplaySize(Activity activity) {
+        Window window;
+        if(activity != null){
+            window = activity.getWindow();
+            Point size = new Point();
+            window.getWindowManager().getDefaultDisplay().getSize(size);
+            return "Size: + "+ size +", SDK: "+ android.os.Build.VERSION.SDK_INT;
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * Get Display Density
+     * @param activity Activity
+     * @return DisplayMetrics display metrics object
+     */
+    public static DisplayMetrics getDisplayDensity(Activity activity) {
+        if(activity != null){
+            return activity.getResources().getDisplayMetrics();
+        }else{
+            return null;
+        }
+    }
+
+    /**
+     * Convert DP to PX
+     * @param context Context
+     * @param dp integer dp value
+     * @return px integer
+     */
+    public static int convertDpToPx(Context context, int dp) {
+        try {
+            return (int) (dp * (context.getResources().getDisplayMetrics().density) + 0.5f);
+        } catch (Exception e) {
+            logThis(TAG, "convertDpToPx Exception", e);
+            return dp;
+        }
+    }
+
+    /**
+     * Convert PX to DP
+     * @param context Context
+     * @param px float pixel
+     * @return dp integer
+     */
+    public static float convertPxToDp(Context context, float px){
+        try {
+            return px / ((float)context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        } catch (Exception e) {
+            logThis(TAG, "convertPxToDp Exception", e);
+            return px;
+        }
+    }
 }
