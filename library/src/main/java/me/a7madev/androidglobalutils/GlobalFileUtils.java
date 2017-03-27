@@ -62,6 +62,7 @@ public class GlobalFileUtils {
      * Return Intent to open any files
      * @param context  The context to use. Use application or activity context
      * @param openFile file object to be opened
+     * @return File Intent
      */
     public static Intent getFileIntent(Context context, File openFile) {
         Intent fileIntent = null;
@@ -112,7 +113,8 @@ public class GlobalFileUtils {
 
     /**
      * Get image or video thumbnail from a file
-     * @param file  Image
+     * @param context Context
+     * @param file Image
      * @return Bitmap bitmap object
      */
     public static Bitmap getMediaThumbnailFromFile(Context context, File file) {

@@ -518,6 +518,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
 
     /**
      * Generate UUID
+     * @return UUID String
      */
     public static String generateUUID() {
         return UUID.randomUUID().toString();
@@ -525,6 +526,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
 
     /**
      * Today's Timestamp
+     * @return String today timestamp
      */
     public static String todayTimestamp() {
         DateTime dateTimeNow = DateTime.now();
@@ -561,7 +563,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
     /**
      * Validate the text
      * @param text String
-     * @return boolean if text is not null & not empty
+     * @return boolean if text is not null and not empty
      */
     public static boolean validateText(String text) {
         return text != null && !text.isEmpty();
