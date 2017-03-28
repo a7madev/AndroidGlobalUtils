@@ -357,6 +357,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
      * Get share text intent
      * @param stringTitle Title
      * @param stringContent Content
+     * @return Intent
      */
     public static Intent getShareTextIntent(String stringTitle, String stringContent) {
         Intent sendIntent = null;
@@ -785,6 +786,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
     /**
      * Get Drawable
      * @param context Context
+     * @param drawableID int
      * @return Drawable object
      */
     public static Drawable getDrawable(Context context, int drawableID) {
