@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.vanniktech.android.javadoc'
 
 android {
     compileSdkVersion 25
@@ -8,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 1014
-        versionName "1.0.14"
+        versionCode 1015
+        versionName "1.0.15"
     }
     buildTypes {
         release {
@@ -41,7 +42,7 @@ ext {
     artifact = 'library'
 
     libraryDescription = 'Android Global Utilities Library'
-    libraryVersion = '1.0.14'
+    libraryVersion = '1.0.15'
 
     developerId = 'a7madev'
     developerName = 'A7maDev'

@@ -9,21 +9,39 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -31,12 +49,19 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.UUID;
 
 public class GlobalUtils implements GlobalUtilsInterface {
@@ -120,7 +145,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
         return internetIsAvailable;
     }
 
-
     /**
      * Create a new typeface from font file.
      * @param context  The context to use. Use application or activity context
@@ -157,7 +181,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
         return typedArray;
     }
 
-
     /**
      * Return the string array associated with a particular resource ID.
      * @param context  The context to use. Use application or activity context
@@ -178,7 +201,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
         return context.getResources().getIntArray(arrayResId);
     }
 
-
     /**
      * Convert String Array to Array List
      * @param stringArray  String Array
@@ -191,7 +213,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
             return null;
         }
     }
-
 
     /**
      * Get content from clipboard
@@ -246,7 +267,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
         }
     }
 
-
     /**
      * Initialize Progress Dialog
      * @param context  The context to use. Use application or activity context
@@ -298,7 +318,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
     public static Bitmap getBitmapByResourceID(Context context, int resID) {
         return BitmapFactory.decodeResource(context.getResources(), resID);
     }
-
 
     /**
      * Get share file intent
@@ -456,7 +475,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
         return emailIntent;
     }
 
-
     /**
      * Open Email Intent
      * @param context  The context to use. Use application or activity context
@@ -471,7 +489,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
             logThis(TAG, "openEmailIntent Exception", e);
         }
     }
-
 
     /**
      * Change Activity Theme
@@ -628,4 +645,673 @@ public class GlobalUtils implements GlobalUtilsInterface {
             return px;
         }
     }
+
+    /**
+     * Get File Name From URL
+     * @param url String
+     * @return File Name String
+     */
+    public static String getFileNameFromURL(String url) {
+        try {
+            String link1Decoded = URLDecoder.decode(url, "UTF-8");
+            return link1Decoded.substring(link1Decoded.lastIndexOf('/') + 1);
+        } catch (UnsupportedEncodingException e) {
+            logThis(TAG, "getFileNameFromURL UnsupportedEncodingException", e);
+            return url;
+        }
+    }
+
+
+    /**
+     * Get Calendar Month Display
+     * @param month integer
+     * @return Month Title String
+     */
+    public static String getCalendarMonthDisplay(int month) {
+        switch (month) {
+            case 1:
+                return "JANUARY";
+            case 2:
+                return "FEBRUARY";
+            case 3:
+                return "MARCH";
+            case 4:
+                return "APRIL";
+            case 5:
+                return "MAY";
+            case 6:
+                return "JUNE";
+            case 7:
+                return "JULY";
+            case 8:
+                return "AUGUST";
+            case 9:
+                return "SEPTEMBER";
+            case 10:
+                return "OCTOBER";
+            case 11:
+                return "NOVEMBER";
+            case 12:
+                return "DECEMBER";
+            default:
+                return "";
+        }
+    }
+
+    /**
+     * Convert String to Integer
+     * @param string text
+     * @return integer number
+     */
+    public static int convertStringToInt(String string) {
+        if (string != null && !string.isEmpty()) {
+            return Integer.parseInt(string);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Is Device Online
+     * @param context Context
+     * @return boolean if device online or not
+     */
+    public static boolean isDeviceOnline(Context context) {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+        return (networkInfo != null && networkInfo.isConnected());
+    }
+
+    /**
+     * Convert Double to String
+     * @param number double
+     * @return Double Number as String
+     */
+    public static String convertDoubleToString(double number) {
+        try {
+            return Double.toString(number);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Dismiss Alert Dialog
+     * @param alertDialog Alert Dialog Object
+     */
+    public static void dismissAlertDialog(AlertDialog alertDialog) {
+        if(alertDialog != null && alertDialog.isShowing()){
+            alertDialog.dismiss();
+        }
+    }
+
+    /**
+     * Dismiss Loading (ProgressDialog and SwipeRefreshLayout)
+     * @param loadingDialog ProgressDialog
+     * @param swipeRefreshLayout SwipeRefreshLayout
+     */
+    public static void dismissLoading(ProgressDialog loadingDialog, SwipeRefreshLayout swipeRefreshLayout) {
+        // dismiss the loading dialog
+        if (loadingDialog != null && loadingDialog.isShowing()) {
+            loadingDialog.dismiss();
+        }
+
+        // dismiss refreshing layout
+        if (swipeRefreshLayout != null && swipeRefreshLayout.isRefreshing()) {
+            swipeRefreshLayout.setRefreshing(false);
+        }
+    }
+
+    /**
+     * Get Color
+     * @param context Context
+     * @param colorID int R.color.something
+     * @return integer
+     */
+    public static int getColor(Context context, int colorID) {
+        try {
+            if(context != null){
+                return ContextCompat.getColor(context, colorID);
+            }else{
+                logThis(TAG, "getColor context is null! colorID: " + colorID, null);
+            }
+        } catch (Exception e) {
+            logThis(TAG, "getColor Exception", e);
+        }
+        return 0;
+    }
+
+    /**
+     * Get Drawable
+     * @param context Context
+     * @return Drawable object
+     */
+    public static Drawable getDrawable(Context context, int drawableID) {
+        try {
+            if(context != null){
+                return ContextCompat.getDrawable(context, drawableID);
+            }else{
+                logThis(TAG, "getColor context is null! colorID: " + drawableID, null);
+            }
+        } catch (Exception e) {
+            logThis(TAG, "getDrawable Exception", e);
+        }
+        return null;
+    }
+
+    /**
+     * Get App Version Name
+     * @param context Context
+     * @return String App Version Name
+     */
+    public static String getAppVersionName(Context context) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            logThis(TAG, "getAppVersionName NameNotFoundException", e);
+            return "";
+        }
+    }
+
+    /**
+     * Get App Version Code
+     * @param context Context
+     * @return String App Version Code Number
+     */
+    public static int getAppVersionCode(Context context) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return pInfo.versionCode;
+        } catch (PackageManager.NameNotFoundException e) {
+            return 0;
+        }
+    }
+
+    /**
+     * Set Actionbar Title
+     * @param appCompatActivity AppCompatActivity
+     * @param title String
+     */
+    public static void setActionBarTitle(AppCompatActivity appCompatActivity, String title) {
+        if (appCompatActivity != null && appCompatActivity.getSupportActionBar() != null) {
+            appCompatActivity.getSupportActionBar().setTitle(title);
+        }
+    }
+
+    /**
+     * Set Actionbar Back Button
+     * @param appCompatActivity AppCompatActivity
+     */
+    public static void setActionBarBackButton(AppCompatActivity appCompatActivity) {
+        if (appCompatActivity != null && appCompatActivity.getSupportActionBar() != null){
+            appCompatActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            appCompatActivity.getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+    }
+
+    /**
+     * Get Today Date Time
+     * @param timezone TimeZone
+     * @return DateTime Object
+     */
+    public static DateTime todayDateTime(String timezone) {
+        if(timezone != null && !timezone.isEmpty()){
+            return DateTime.now(DateTimeZone.forID(timezone));
+        }else{
+            return DateTime.now(DateTimeZone.forID("Asia/Bahrain"));
+        }
+    }
+
+    /**
+     * Get Today Local Date Time
+     * @param timezone TimeZone
+     * @return DateTime Object
+     */
+    public static LocalDateTime todayLocalDateTime(String timezone) {
+        if(timezone != null && !timezone.isEmpty()){
+            return LocalDateTime.now(DateTimeZone.forID(timezone));
+        }else{
+            return LocalDateTime.now(DateTimeZone.forID("Asia/Bahrain"));
+        }
+    }
+
+    /**
+     * Validate And Set Alternative String otherwise
+     * @param text String
+     * @param alternativeText String
+     * @return String alternativeText
+     */
+    public static String validateAndSetAlternativeString(String text, String alternativeText) {
+        if(validateText(text)){
+            return text;
+        }else{
+            return alternativeText;
+        }
+    }
+
+    /**
+     * Is Build Flavor
+     * @param flavorName String
+     * @return boolean is true or not
+     */
+    public static boolean isBuildFlavor(String flavorName) {
+        if(validateText(flavorName)){
+            return BuildConfig.FLAVOR.equalsIgnoreCase(flavorName);
+        }
+        return false;
+    }
+
+    /**
+     * Generate Now Timestamp
+     * @return String generated timestamp
+     */
+    public static String generateNowTimestamp() {
+        try {
+            return String.valueOf(System.currentTimeMillis());
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /**
+     * Open SMS Intent
+     * @param context Context
+     * @param number String
+     */
+    public static void openSMSIntent(Context context, String number) {
+        try {
+            if(validateText(number)) {
+                Intent sendIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + number));
+                sendIntent.setType("vnd.android-dir/mms-sms");
+                sendIntent.setData(Uri.parse("sms:" + number));
+                sendIntent.putExtra("address", number);
+                context.startActivity(sendIntent);
+            }else{
+                showToast(context, "Invalid number!", 0, false);
+            }
+        } catch (Exception e) {
+            showToast(context, "Unable to open messaging application!", 0, false);
+            logThis(TAG, "openSMSIntent Exception", e);
+        }
+    }
+
+    /**
+     * Parse To HTML
+     * @param source HTML Source
+     * @return Spanned HTML
+     */
+    public static Spanned parseToHTML(String source) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return Html.fromHtml(source, Html.FROM_HTML_MODE_LEGACY);
+        } else {
+            return Html.fromHtml(source);
+        }
+    }
+
+    /**
+     * Show Snackbar
+     * @param appCompatActivity FragmentActivity
+     * @param view View
+     * @param text String
+     * @param duration Snackbar.LENGTH_LONG or Snackbar.LENGTH_SHORT
+     * @param findViewByID int R.id.coordinatorLayout
+     */
+    public static void showSnackbar(FragmentActivity appCompatActivity, View view, String text, int duration, int findViewByID) {
+        if (text != null) {
+
+            // validate duration
+            if (duration == 0) {
+                duration = Snackbar.LENGTH_LONG;
+            } else {
+                duration = Snackbar.LENGTH_SHORT;
+            }
+
+            View theView = view;
+            if (view == null) {
+                theView = appCompatActivity.findViewById(findViewByID);
+            }
+
+            Snackbar snackbar = Snackbar.make(theView, text, duration);
+            snackbar.setAction("", null);
+            snackbar.show();
+        }
+    }
+
+    /**
+     * Recurse parents children and children children views
+     * @param v View
+     * @return List of views
+     */
+    public static ArrayList<View> getAllChildrenInView(View v) {
+
+        if (!(v instanceof ViewGroup)) {
+            ArrayList<View> viewArrayList = new ArrayList<>();
+            viewArrayList.add(v);
+            return viewArrayList;
+        }
+
+        ArrayList<View> result = new ArrayList<>();
+
+        ViewGroup viewGroup = (ViewGroup) v;
+        for (int i = 0; i < viewGroup.getChildCount(); i++) {
+
+            View child = viewGroup.getChildAt(i);
+
+            ArrayList<View> viewArrayList = new ArrayList<>();
+            viewArrayList.add(v);
+            viewArrayList.addAll(getAllChildrenInView(child));
+
+            result.addAll(viewArrayList);
+        }
+        return result;
+    }
+
+    /**
+     * Dismiss Search View
+     * @param searchView SearchView
+     */
+    public static void dismissSearchView(SearchView searchView) {
+        try {
+            if(searchView != null) {
+                searchView.setQuery("", false);
+                searchView.clearFocus();
+                searchView.onActionViewCollapsed();
+            }
+        } catch (Exception e) {
+            logThis(TAG, "dismissSearchView Exception", e);
+        }
+    }
+
+    /**
+     * Convert Boolean to String
+     * @param bool boolean
+     * @return String true or false
+     */
+    public static String convertBooleanToString(boolean bool){
+        return bool ? "true" : "false";
+    }
+
+    /**
+     * Rotate Image
+     * @param filePath String
+     * @return Bitmap Image Rotated
+     */
+    public static Bitmap rotateImage(String filePath) {
+        try {
+            if(validateText(filePath)) {
+                BitmapFactory.Options bounds = new BitmapFactory.Options();
+                bounds.inJustDecodeBounds = true;
+                BitmapFactory.decodeFile(filePath, bounds);
+
+                BitmapFactory.Options opts = new BitmapFactory.Options();
+                Bitmap bm = BitmapFactory.decodeFile(filePath, opts);
+                ExifInterface exif = new ExifInterface(filePath);
+                String orientString = exif.getAttribute(ExifInterface.TAG_ORIENTATION);
+                int orientation = orientString != null ? Integer.parseInt(orientString) : ExifInterface.ORIENTATION_NORMAL;
+
+                int rotationAngle = 0;
+                if (orientation == ExifInterface.ORIENTATION_ROTATE_90) rotationAngle = 90;
+                if (orientation == ExifInterface.ORIENTATION_ROTATE_180) rotationAngle = 180;
+                if (orientation == ExifInterface.ORIENTATION_ROTATE_270) rotationAngle = 270;
+
+                Matrix matrix = new Matrix();
+                matrix.setRotate(rotationAngle, (float) bm.getWidth() / 2, (float) bm.getHeight() / 2);
+                return Bitmap.createBitmap(bm, 0, 0, bounds.outWidth, bounds.outHeight, matrix, true);
+            }
+        } catch (IOException e) {
+            logThis(TAG, "rotateImage IOException", e);
+        }
+        return null;
+    }
+
+    /**
+     * Convert String to Double
+     * @param string String
+     * @return double value
+     */
+    public static double convertStringToDouble(String string) {
+        if (string != null && !string.isEmpty()) {
+            return Double.parseDouble(string);
+        } else {
+            return 0.0;
+        }
+    }
+
+    /**
+     * Accept Image
+     * @param acceptedImageFileExtensions String[]
+     * @param file File
+     * @return boolean
+     */
+    public static boolean acceptImage(String[] acceptedImageFileExtensions, File file) {
+        try {
+            for (String extension : acceptedImageFileExtensions)
+            {
+                if (file.getName().toLowerCase().endsWith(extension))
+                {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            logThis(TAG, "acceptImage Exception", e);
+        }
+        return false;
+    }
+
+    /**
+     * Accept Video
+     * @param acceptedVideoFileExtensions String[]
+     * @param file File
+     * @return boolean
+     */
+    public static boolean acceptVideo(String[] acceptedVideoFileExtensions, File file) {
+        try {
+            for (String extension : acceptedVideoFileExtensions)
+            {
+                if (file.getName().toLowerCase().endsWith(extension))
+                {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            logThis(TAG, "acceptVideo Exception", e);
+        }
+        return false;
+    }
+
+    /**
+     * Hide Keyboard
+     * @param fragmentActivity FragmentActivity
+     */
+    public static void hideKeyboard(FragmentActivity fragmentActivity) {
+        try {
+            View view = fragmentActivity.getCurrentFocus();
+            if (view != null) {
+                InputMethodManager imm = (InputMethodManager)fragmentActivity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        } catch (Exception e) {
+            logThis(TAG, "hideKeyboard Exception", e);
+        }
+    }
+
+    /**
+     * Convert Integer to String
+     * @param number integer
+     * @return String number
+     */
+    public static String convertIntToString(int number) {
+        String string = null;
+        try {
+            string = Integer.toString(number);
+            if (string.isEmpty()) {
+                string = String.valueOf(number);
+            }
+        } catch (Exception e) {
+            logThis(TAG, "convertIntToString Exception", e);
+        }
+        return string;
+    }
+
+    /**
+     * Generate Date Time String
+     * @param dateTime LocalDateTime
+     * @return String date time (Year Month Day)
+     */
+    public static String generateDateTimeString(LocalDateTime dateTime) {
+        return createDateTimeString(getTwoDigitsInt(dateTime.getYear()), getTwoDigitsInt(dateTime.getMonthOfYear()), getTwoDigitsInt(dateTime.getDayOfMonth()), true);
+    }
+
+    /**
+     * Get Date Time from Timestamp
+     * @param timeStamp String
+     * @param format String
+     * @return LocalDateTime
+     */
+    public static LocalDateTime getDateTime(String timeStamp, String format) {
+
+        LocalDateTime dateTime = null;
+
+        if (validateText(timeStamp)) {
+            if (format != null) {
+                dateTime = LocalDateTime.parse(timeStamp, DateTimeFormat.forPattern(format));
+            } else {
+                dateTime = LocalDateTime.parse(timeStamp);
+            }
+        }
+
+        return dateTime;
+    }
+
+    /**
+     * Get Shared Prefs
+     * @param context Context
+     * @param prefsName String
+     * @param className Class String.class, Boolean.class
+     * @param key String
+     * @return Object
+     */
+    public static Object getSharedPrefs(Context context, String prefsName, Class className, String key) {
+
+        Object object = null;
+
+        try {
+            if (className == String.class) {
+                object = initSharedPrefs(context, prefsName).getString(key, null);
+            } else if (className == Boolean.class) {
+                object = initSharedPrefs(context, prefsName).getBoolean(key, false);
+            } else if (className == Integer.class) {
+                object = initSharedPrefs(context, prefsName).getInt(key, 0);
+            } else if (className == Long.class) {
+                object = initSharedPrefs(context, prefsName).getLong(key, 0);
+            } else if (className == Float.class) {
+                object = initSharedPrefs(context, prefsName).getFloat(key, 0);
+            }
+        } catch (Exception e) {
+            logThis(TAG, "getSharedPrefs Exception", e);
+        }
+
+        return object;
+    }
+
+    /**
+     * Init Shared Prefs
+     * @param context Context
+     * @param prefsName String
+     * @return SharedPreferences
+     */
+    public static SharedPreferences initSharedPrefs(Context context, String prefsName) {
+        return context.getSharedPreferences(prefsName, 0);
+    }
+
+    /**
+     * Init Shared Prefs
+     * @param context Context
+     * @param prefsName String
+     */
+    public static void clearSharedPrefs(Context context, String prefsName) {
+        try {
+            initSharedPrefs(context, prefsName).edit().clear().apply();
+        } catch (Exception e) {
+            logThis(TAG, "clearSharedPrefs Exception " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Log Intent Extras
+     * @param TAG String
+     * @param bundle Bundle
+     */
+    public static void logIntentExtras(String TAG, Bundle bundle) {
+        if (bundle != null) {
+            for (String key : bundle.keySet()) {
+                Object value = bundle.get(key);
+                Log.d(TAG, String.format("%s %s (%s)", key, value != null ? value.toString() : " _ ", value!= null ? value.getClass().getName() : " _ "));
+            }
+        }
+    }
+
+    /**
+     * Save Shared Prefs One
+     * @param context Context
+     * @param prefsName String
+     * @param key String
+     * @param value Object
+     */
+    public static void saveSharedPrefsOne(Context context, String prefsName, String key, Object value) {
+
+        try {
+            if (key != null) {
+                SharedPreferences.Editor editor = initSharedPrefs(context, prefsName).edit();
+                if (value instanceof String) {
+                    editor.putString(key, (String) value).apply();
+                } else if (value instanceof Boolean) {
+                    editor.putBoolean(key, (boolean) value).apply();
+                } else if (value instanceof Long) {
+                    editor.putLong(key, (long) value).apply();
+                } else if (value instanceof Integer) {
+                    editor.putLong(key, (int) value).apply();
+                }else{
+                    editor.putString(key, null).apply();
+                }
+            }
+        } catch (Exception e) {
+            logThis(TAG, "saveSharedPrefsOne Exception", e);
+        }
+    }
+
+    /**
+     * Save Shared Prefs List
+     * @param context Context
+     * @param prefsName String
+     * @param hashMap Map of String and Object
+     */
+    public static void saveSharedPrefsList(Context context, String prefsName, Map<String, Object> hashMap) {
+        try {
+            SharedPreferences.Editor editor = initSharedPrefs(context, prefsName).edit();
+            for (Map.Entry<String, Object> entry : hashMap.entrySet()) {
+                String key = entry.getKey();
+                Object value = entry.getValue();
+                if (key != null) {
+
+                    if (value instanceof String) {
+                        editor.putString(key, (String) value).apply();
+                    } else if (value instanceof Boolean) {
+                        editor.putBoolean(key, (boolean) value).apply();
+                    } else if (value instanceof Long) {
+                        editor.putLong(key, (long) value).apply();
+                    } else if (value instanceof Integer) {
+                        editor.putLong(key, (int) value).apply();
+                    }
+                }
+            }
+            editor.apply();
+        } catch (Exception e) {
+            logThis(TAG, "saveSharedPrefsList Exception", e);
+        }
+    }
+
+
 }
