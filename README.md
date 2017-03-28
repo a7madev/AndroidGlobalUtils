@@ -88,8 +88,10 @@ GlobalUtils Class
 :  convertBooleanToString
 :  rotateImage
 :  convertStringToDouble
-:  acceptImage
-:  acceptVideo
+:  acceptImageFromPath
+:  acceptImageFromFile
+:  acceptVideoFromPath
+:  acceptVideoFromFile
 :  hideKeyboard
 :  convertIntToString
 :  generateDateTimeString
@@ -100,6 +102,7 @@ GlobalUtils Class
 :  logIntentExtras
 :  saveSharedPrefsOne
 :  saveSharedPrefsList
+:  getURIFromFilePath
 
 GlobalFileUtils Class
 ----------
@@ -114,6 +117,13 @@ GlobalFileUtils Class
 :  getStorageDirectory
 :  isExternalStorageWritable
 :  isExternalStorageReadable
+
+
+Other Classes
+----------
+:  CustomScrollView
+:  CustomViewPagerAdapter
+:  ToggleableRadioButton
 
 # License
 This plugin is available under the [GPL License, Version 3.0](http://www.gnu.org/licenses/gpl-3.0.en.html).

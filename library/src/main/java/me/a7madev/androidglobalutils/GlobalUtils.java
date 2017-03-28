@@ -30,6 +30,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -38,11 +39,15 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -1082,12 +1087,34 @@ public class GlobalUtils implements GlobalUtilsInterface {
     }
 
     /**
-     * Accept Image
+     * Accept Image From Path
+     * @param acceptedImageFileExtensions String[]
+     * @param path String
+     * @return boolean is valid or not
+     */
+    public static boolean acceptImageFromPath(String[] acceptedImageFileExtensions, String path) {
+        try {
+            for (String extension : acceptedImageFileExtensions)
+            {
+                if (path.toLowerCase().endsWith(extension))
+                {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            logThis(TAG, "acceptImageFromPath Exception", e);
+        }
+        return false;
+    }
+
+
+    /**
+     * Accept Image From File
      * @param acceptedImageFileExtensions String[]
      * @param file File
-     * @return boolean
+     * @return boolean is valid or not
      */
-    public static boolean acceptImage(String[] acceptedImageFileExtensions, File file) {
+    public static boolean acceptImageFromFile(String[] acceptedImageFileExtensions, File file) {
         try {
             for (String extension : acceptedImageFileExtensions)
             {
@@ -1097,18 +1124,39 @@ public class GlobalUtils implements GlobalUtilsInterface {
                 }
             }
         } catch (Exception e) {
-            logThis(TAG, "acceptImage Exception", e);
+            logThis(TAG, "acceptImageFromFile Exception", e);
         }
         return false;
     }
 
     /**
-     * Accept Video
+     * Accept Video From Path
+     * @param acceptedVideoFileExtensions String[]
+     * @param path String
+     * @return boolean is valid or not
+     */
+    public static boolean acceptVideoFromPath(String[] acceptedVideoFileExtensions, String path) {
+        try {
+            for (String extension : acceptedVideoFileExtensions)
+            {
+                if (path.toLowerCase().endsWith(extension))
+                {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            logThis(TAG, "acceptVideoFromPath Exception", e);
+        }
+        return false;
+    }
+
+    /**
+     * Accept Video From File
      * @param acceptedVideoFileExtensions String[]
      * @param file File
-     * @return boolean
+     * @return boolean is valid or not
      */
-    public static boolean acceptVideo(String[] acceptedVideoFileExtensions, File file) {
+    public static boolean acceptVideoFromFile(String[] acceptedVideoFileExtensions, File file) {
         try {
             for (String extension : acceptedVideoFileExtensions)
             {
@@ -1118,7 +1166,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
                 }
             }
         } catch (Exception e) {
-            logThis(TAG, "acceptVideo Exception", e);
+            logThis(TAG, "acceptVideoFromFile Exception", e);
         }
         return false;
     }
@@ -1315,5 +1363,82 @@ public class GlobalUtils implements GlobalUtilsInterface {
         }
     }
 
+    /**
+     * Dismiss Search View Menu
+     * @param optionsMenu Menu
+     * @param findViewByID int R.id.action_search
+     */
+    public static void dismissSearchViewMenu(Menu optionsMenu, int findViewByID) {
+        try {
+            if(optionsMenu != null) {
+                MenuItem searchMenuItem = optionsMenu.findItem(findViewByID);
+                if (searchMenuItem != null) {
+                    searchMenuItem.collapseActionView();
+                }
+            }
+        } catch (Exception e) {
+            logThis(TAG, "dismissSearchViewMenu", e);
+        }
+    }
+
+    /**
+     * Custom Spinner Adapter
+     * @param context Context
+     * @param array int
+     * @return CharSequence Array Adapter
+     */
+    public static ArrayAdapter<CharSequence> customSpinnerAdapter(Context context, int array) {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(context, array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        return adapter;
+    }
+
+    /**
+     * Custom Spinner Adapter With Hint
+     * @param context Context
+     * @return String Array Adapter
+     */
+    public static ArrayAdapter<String> customSpinnerAdapterWithHint(Context context) {
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(context, android.R.layout.simple_spinner_dropdown_item) {
+
+            @Override
+            public View getView(int position, View convertView, ViewGroup parent) {
+                View v = super.getView(position, convertView, parent);
+                if (position == getCount()) {
+                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
+                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                }
+                return v;
+            }
+
+            @Override
+            public int getCount() {
+                return super.getCount()-1; // you dont display last item. It is used as hint.
+            }
+
+        };
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        return adapter;
+    }
+
+    /**
+     * Get URI From File Path
+     * @param context Context
+     * @param filePath String
+     * @return Uri
+     */
+    public static Uri getURIFromFilePath(Context context, String filePath) {
+        Uri uri = null;
+        if(GlobalUtils.validateText(filePath)) {
+            try {
+                uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", new File(filePath));
+            } catch (Exception e) {
+                logThis(TAG, "getURIFromFilePath Exception", e);
+                uri = Uri.fromFile(new File(filePath));
+            }
+        }
+        return uri;
+    }
 
 }
