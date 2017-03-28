@@ -15,7 +15,7 @@ Global Utilities for Android
 #### Step 1: Add to project build.gradle
 
     dependencies {
-        compile 'me.a7madev.androidglobalutils:library:1.0.16'
+        compile 'me.a7madev.androidglobalutils:library:1.+'
     }
 
 #### Step 2: Import package in your java class
