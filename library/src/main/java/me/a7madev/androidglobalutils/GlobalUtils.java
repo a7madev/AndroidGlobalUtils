@@ -139,7 +139,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
             ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
             NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
 
-            //validate internet connection
+            // validate internet connection
             if (activeNetworkInfo != null && activeNetworkInfo.isConnected() && activeNetworkInfo.isAvailable()) {
                 internetIsAvailable = true;
             }
@@ -580,7 +580,16 @@ public class GlobalUtils implements GlobalUtilsInterface {
      * @return String two digits
      */
     public static String getTwoDigitsInt(int num) {
-        return String.format(Locale.US,"%02d", num);
+        return String.format(Locale.US, "%02d", num);
+    }
+
+    /**
+     * Get Three Digits Integer
+     * @param num integer number
+     * @return String two digits
+     */
+    public static String getThreeDigitsInt(int num) {
+        return String.format(Locale.US, "%03d", num);
     }
 
     /**
@@ -667,43 +676,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
         }
     }
 
-
-    /**
-     * Get Calendar Month Display
-     * @param month integer
-     * @return Month Title String
-     */
-    public static String getCalendarMonthDisplay(int month) {
-        switch (month) {
-            case 1:
-                return "JANUARY";
-            case 2:
-                return "FEBRUARY";
-            case 3:
-                return "MARCH";
-            case 4:
-                return "APRIL";
-            case 5:
-                return "MAY";
-            case 6:
-                return "JUNE";
-            case 7:
-                return "JULY";
-            case 8:
-                return "AUGUST";
-            case 9:
-                return "SEPTEMBER";
-            case 10:
-                return "OCTOBER";
-            case 11:
-                return "NOVEMBER";
-            case 12:
-                return "DECEMBER";
-            default:
-                return "";
-        }
-    }
-
     /**
      * Convert String to Integer
      * @param string text
@@ -715,18 +687,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
         } else {
             return 0;
         }
-    }
-
-    /**
-     * Is Device Online
-     * @param context Context
-     * @return boolean if device online or not
-     */
-    public static boolean isDeviceOnline(Context context) {
-        ConnectivityManager connMgr =
-                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        return (networkInfo != null && networkInfo.isConnected());
     }
 
     /**
@@ -988,29 +948,31 @@ public class GlobalUtils implements GlobalUtilsInterface {
 
     /**
      * Recurse parents children and children children views
-     * @param v View
+     * @param view View
      * @return List of views
      */
-    public static ArrayList<View> getAllChildrenInView(View v) {
+    public static ArrayList<View> getAllChildrenInView(View view) {
+        ArrayList<View> result = null;
+        try {
+            if (!(view instanceof ViewGroup)) {
+                ArrayList<View> viewArrayList = new ArrayList<>();
+                viewArrayList.add(view);
+                return viewArrayList;
+            }
+            result = new ArrayList<>();
+            ViewGroup viewGroup = (ViewGroup) view;
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
 
-        if (!(v instanceof ViewGroup)) {
-            ArrayList<View> viewArrayList = new ArrayList<>();
-            viewArrayList.add(v);
-            return viewArrayList;
-        }
+                View child = viewGroup.getChildAt(i);
 
-        ArrayList<View> result = new ArrayList<>();
+                ArrayList<View> viewArrayList = new ArrayList<>();
+                viewArrayList.add(view);
+                viewArrayList.addAll(getAllChildrenInView(child));
 
-        ViewGroup viewGroup = (ViewGroup) v;
-        for (int i = 0; i < viewGroup.getChildCount(); i++) {
-
-            View child = viewGroup.getChildAt(i);
-
-            ArrayList<View> viewArrayList = new ArrayList<>();
-            viewArrayList.add(v);
-            viewArrayList.addAll(getAllChildrenInView(child));
-
-            result.addAll(viewArrayList);
+                result.addAll(viewArrayList);
+            }
+        } catch (Exception e) {
+            logThis(TAG, "getAllChildrenInView Exception", e);
         }
         return result;
     }
@@ -1221,22 +1183,23 @@ public class GlobalUtils implements GlobalUtilsInterface {
      * @return LocalDateTime
      */
     public static LocalDateTime getDateTime(String timeStamp, String format) {
-
         LocalDateTime dateTime = null;
-
-        if (validateText(timeStamp)) {
-            if (format != null) {
-                dateTime = LocalDateTime.parse(timeStamp, DateTimeFormat.forPattern(format));
-            } else {
-                dateTime = LocalDateTime.parse(timeStamp);
+        try {
+            if (validateText(timeStamp)) {
+                if (format != null) {
+                    dateTime = LocalDateTime.parse(timeStamp, DateTimeFormat.forPattern(format));
+                } else {
+                    dateTime = LocalDateTime.parse(timeStamp);
+                }
             }
+        } catch (Exception e) {
+            logThis(TAG, "getDateTime Exception", e);
         }
-
         return dateTime;
     }
 
     /**
-     * Get Shared Prefs
+     * Get Shared Prefs By Key
      * @param context Context
      * @param prefsName String
      * @param className Class String.class, Boolean.class
@@ -1267,17 +1230,17 @@ public class GlobalUtils implements GlobalUtilsInterface {
     }
 
     /**
-     * Init Shared Prefs
+     * Initialize Shared Prefs
      * @param context Context
      * @param prefsName String
      * @return SharedPreferences
      */
     public static SharedPreferences initSharedPrefs(Context context, String prefsName) {
-        return context.getSharedPreferences(prefsName, 0);
+        return context.getSharedPreferences(prefsName, Context.MODE_PRIVATE);
     }
 
     /**
-     * Init Shared Prefs
+     * Clear Shared Prefs
      * @param context Context
      * @param prefsName String
      */
@@ -1304,7 +1267,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
     }
 
     /**
-     * Save Shared Prefs One
+     * Save Shared Prefs (One Item)
      * @param context Context
      * @param prefsName String
      * @param key String
@@ -1333,7 +1296,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
     }
 
     /**
-     * Save Shared Prefs List
+     * Save Shared Prefs (List)
      * @param context Context
      * @param prefsName String
      * @param hashMap Map of String and Object
@@ -1377,7 +1340,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
                 }
             }
         } catch (Exception e) {
-            logThis(TAG, "dismissSearchViewMenu", e);
+            logThis(TAG, "dismissSearchViewMenu Exception", e);
         }
     }
 
@@ -1406,14 +1369,14 @@ public class GlobalUtils implements GlobalUtilsInterface {
                 View v = super.getView(position, convertView, parent);
                 if (position == getCount()) {
                     ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); // Hint to be displayed
                 }
                 return v;
             }
 
             @Override
             public int getCount() {
-                return super.getCount()-1; // you dont display last item. It is used as hint.
+                return super.getCount()-1; // you don't display last item. It is used as hint.
             }
 
         };
@@ -1426,16 +1389,24 @@ public class GlobalUtils implements GlobalUtilsInterface {
      * Get URI From File Path
      * @param context Context
      * @param filePath String
+     * @param applicationID String (BuildConfig.APPLICATION_ID)
      * @return Uri
      */
-    public static Uri getURIFromFilePath(Context context, String filePath) {
+    public static Uri getURIFromFilePath(Context context, String filePath, String applicationID) {
         Uri uri = null;
         if(GlobalUtils.validateText(filePath)) {
             try {
-                uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", new File(filePath));
+                uri = FileProvider.getUriForFile(context, applicationID + ".provider", new File(filePath));
             } catch (Exception e) {
                 logThis(TAG, "getURIFromFilePath Exception", e);
-                uri = Uri.fromFile(new File(filePath));
+                uri = null;
+            }
+            if(uri == null){
+                try {
+                    uri = Uri.fromFile(new File(filePath));
+                } catch (Exception e) {
+                    logThis(TAG, "getURIFromFilePath Exception", e);
+                }
             }
         }
         return uri;
