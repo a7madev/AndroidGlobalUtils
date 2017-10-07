@@ -12,13 +12,13 @@ Global Utilities for Android
 
 ## Gradle
 
-#### Step 1: Add to project build.gradle
+#### Step 1*Add to project build.gradle
 
     dependencies {
         compile 'me.a7madev.androidglobalutils:library:1.+'
     }
 
-#### Step 2: Import package in your java class
+#### Step 2*Import package in your java class
 
     import me.a7madev.androidglobalutils.*;
 
@@ -27,103 +27,120 @@ Global Utilities for Android
 GlobalUtils Class
 ----------
 
-:  isDebug
-:  logThis
-:  showToast
-:  checkForInternetConnection
-:  getTypeFace
-:  getTypedArrayResource
-:  getStringArray
-:  getIntArray
-:  convertStringArrayToArrayList
-:  getContentFromClipboard
-:  requestMultiplePermissions
-:  initProgressDialog
-:  dismissProgressDialog
-:  getBitmapByResourceID
-:  getShareFileIntent
-:  openShareFileIntent
-:  getShareTextIntent
-:  openShareTextIntent
-:  getCallIntent
-:  openCallIntent
-:  getURLIntent
-:  openURLIntent
-:  getnEmailIntent
-:  openEmailIntent
-:  changeActivityTheme
-:  loadImage
-:  generateUUID
-:  todayTimestamp
-:  createDateTimeString
-:  getTwoDigitsInt
-:  validateText
-:  getDisplaySize
-:  getDisplayDensity
-:  convertDpToPx
-:  convertPxToDp
-:  getFileNameFromURL
-:  getCalendarMonthDisplay
-:  convertStringToInt
-:  isDeviceOnline
-:  convertDoubleToString
-:  dismissAlertDialog
-:  dismissLoading
-:  getColor
-:  getDrawable
-:  getAppVersionName
-:  getAppVersionCode
-:  setActionBarTitle
-:  setActionBarBackButton
-:  todayDateTime
-:  todayLocalDateTime
-:  validateAndSetAlternativeString
-:  isBuildFlavor
-:  generateNowTimestamp
-:  openSMSIntent
-:  parseToHTML
-:  showSnackbar
-:  getAllChildrenInView
-:  dismissSearchView
-:  convertBooleanToString
-:  rotateImage
-:  convertStringToDouble
-:  acceptImageFromPath
-:  acceptImageFromFile
-:  acceptVideoFromPath
-:  acceptVideoFromFile
-:  hideKeyboard
-:  convertIntToString
-:  generateDateTimeString
-:  getDateTime
-:  getSharedPrefs
-:  initSharedPrefs
-:  clearSharedPrefs
-:  logIntentExtras
-:  saveSharedPrefsOne
-:  saveSharedPrefsList
-:  getURIFromFilePath
+* isDebug
+* logThis
+* showToast
+* checkForInternetConnection
+* getTypeFace
+* getTypedArrayResource
+* getStringArray
+* getIntArray
+* convertStringArrayToArrayList
+* getContentFromClipboard
+* requestMultiplePermissions
+* initProgressDialog
+* dismissProgressDialog
+* getBitmapByResourceID
+* getShareTextIntent
+* openShareTextIntent
+* getCallIntent
+* openCallIntent
+* getURLIntent
+* openURLIntent
+* getnEmailIntent
+* openEmailIntent
+* changeActivityTheme
+* loadImage
+* generateUUID
+* todayTimestamp
+* createDateTimeString
+* getTwoDigitsInt
+* validateText
+* getDisplaySize
+* getDisplayDensity
+* convertDpToPx
+* convertPxToDp
+* getCalendarMonthDisplay
+* convertStringToInt
+* isDeviceOnline
+* convertDoubleToString
+* dismissAlertDialog
+* dismissLoading
+* getColor
+* getDrawable
+* getAppVersionName
+* getAppVersionCode
+* setActionBarTitle
+* setActionBarBackButton
+* todayDateTime
+* todayLocalDateTime
+* validateAndSetAlternativeString
+* isBuildFlavor
+* generateNowTimestampString
+* generateNowTimestamp
+* openSMSIntent
+* parseToHTML
+* showSnackbar
+* getAllChildrenInView
+* dismissSearchView
+* convertBooleanToString
+* rotateImage
+* convertStringToDouble
+* hideKeyboard
+* convertIntToString
+* generateDateTimeString
+* getDateTime
+* getSharedPrefs
+* initSharedPrefs
+* clearSharedPrefs
+* logIntentExtras
+* saveSharedPrefsOne
+* saveSharedPrefsList
+* sleepThread
+* convertStringToLong
+* getHumanReadableBoolean
+* getURIFromURL
+* encodeURL
+* convertStringToFloat
+* convertLongToString
+* convertFloatToString
+* getFormattedDateString
+* getRelativeDateTimeString
+* getBoolFromBooleanObject
+* setupSwipeRefresh
+* disableSwipeRefresh
+
 
 GlobalFileUtils Class
 ----------
 
-:  getMimeType
-:  openFileIntent
-:  getFileIntent
-:  getFilesListFromDirectory
-:  getMediaThumbnailFromFile
-:  deleteFile
-:  getFileNameFromURL
-:  getStorageDirectory
-:  isExternalStorageWritable
-:  isExternalStorageReadable
+* getMimeType
+* openFileIntent
+* getFileIntent
+* getFilesListFromDirectory
+* getMediaThumbnailFromFile
+* deleteFile
+* getStorageDirectory
+* isExternalStorageWritable
+* isExternalStorageReadable
+* getFileNameFromURL
+* acceptImageFromFile
+* acceptVideoFromFile
+* acceptImageFromFilePath
+* acceptVideoFromFilePath
+* getURIFromFilePath
+* getShareFileIntent
+* openShareFileIntent
+* getMimeTypeFromFileURI
+* getMimeTypeFromFile
+* getPathFromFileURI
 
 
 Other Classes
 ----------
-:  CustomScrollView
-:  CustomViewPagerAdapter
-:  ToggleableRadioButton
+* CustomScrollView
+* CustomViewPagerAdapter
+* ToggleableRadioButton
 
 # License
 This plugin is available under the [GPL License, Version 3.0](http://www.gnu.org/licenses/gpl-3.0.en.html).

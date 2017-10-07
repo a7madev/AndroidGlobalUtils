@@ -14,6 +14,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -26,11 +27,11 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -58,10 +59,7 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.LocalDateTime;
 import org.joda.time.format.DateTimeFormat;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -322,40 +320,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
      */
     public static Bitmap getBitmapByResourceID(Context context, int resID) {
         return BitmapFactory.decodeResource(context.getResources(), resID);
-    }
-
-    /**
-     * Get share file intent
-     * @param context  The context to use. Use application or activity context
-     * @param file file object to be opened
-     * @return Intent
-     */
-    public static Intent getShareFileIntent(Context context, File file) {
-        Intent shareIntent = null;
-        try {
-            Uri fileURI = Uri.fromFile(file);
-            shareIntent = new Intent();
-            shareIntent.setAction(Intent.ACTION_SEND);
-            shareIntent.putExtra(Intent.EXTRA_STREAM, fileURI);
-            shareIntent.setType(GlobalFileUtils.getMimeType(context, fileURI));
-        } catch (Exception e) {
-            logThis(TAG, "getShareFileIntent Exception", e);
-        }
-        return shareIntent;
-    }
-
-    /**
-     * Opens share file intent
-     * @param context  The context to use. Use application or activity context
-     * @param file file object to be opened
-     * @param shareDialogMessage Show message appears in share dialog
-     */
-    public static void openShareFileIntent(Context context, File file, String shareDialogMessage) {
-        try {
-            context.startActivity(Intent.createChooser(getShareFileIntent(context, file), shareDialogMessage));
-        } catch (Exception e) {
-            logThis(TAG, "openShareFileIntent Exception", e);
-        }
     }
 
     /**
@@ -662,21 +626,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
     }
 
     /**
-     * Get File Name From URL
-     * @param url String
-     * @return File Name String
-     */
-    public static String getFileNameFromURL(String url) {
-        try {
-            String link1Decoded = URLDecoder.decode(url, "UTF-8");
-            return link1Decoded.substring(link1Decoded.lastIndexOf('/') + 1);
-        } catch (UnsupportedEncodingException e) {
-            logThis(TAG, "getFileNameFromURL UnsupportedEncodingException", e);
-            return url;
-        }
-    }
-
-    /**
      * Convert String to Integer
      * @param string text
      * @return integer number
@@ -871,23 +820,39 @@ public class GlobalUtils implements GlobalUtilsInterface {
     }
 
     /**
-     * Generate Now Timestamp
+     * Generate Now Timestamp String
      * @return String generated timestamp
      */
-    public static String generateNowTimestamp() {
+    public static String generateNowTimestampString() {
         try {
-            return String.valueOf(System.currentTimeMillis());
+            return String.valueOf(generateNowTimestamp());
         } catch (Exception e) {
+            logThis(TAG, "generateNowTimestampString Exception", e);
             return "";
+        }
+    }
+
+    /**
+     * Generate Now Timestamp
+     * @return Long generated timestamp
+     */
+    public static long generateNowTimestamp() {
+        try {
+            return System.currentTimeMillis();
+        } catch (Exception e) {
+            logThis(TAG, "generateNowTimestamp Exception", e);
+            return Long.MIN_VALUE;
         }
     }
 
     /**
      * Open SMS Intent
      * @param context Context
+     * @param invalidNumberMessage String "Invalid Number" or null
+     * @param exceptionMessage String "Unable to open messaging application!" or null
      * @param number String
      */
-    public static void openSMSIntent(Context context, String number) {
+    public static void openSMSIntent(Context context, String number, String invalidNumberMessage, String exceptionMessage) {
         try {
             if(validateText(number)) {
                 Intent sendIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("sms:" + number));
@@ -896,10 +861,14 @@ public class GlobalUtils implements GlobalUtilsInterface {
                 sendIntent.putExtra("address", number);
                 context.startActivity(sendIntent);
             }else{
-                showToast(context, "Invalid number!", 0, false);
+                if(invalidNumberMessage != null) {
+                    showToast(context, invalidNumberMessage, 0, false);
+                }
             }
         } catch (Exception e) {
-            showToast(context, "Unable to open messaging application!", 0, false);
+            if(exceptionMessage != null){
+                showToast(context, exceptionMessage, Toast.LENGTH_SHORT, false);
+            }
             logThis(TAG, "openSMSIntent Exception", e);
         }
     }
@@ -1046,91 +1015,6 @@ public class GlobalUtils implements GlobalUtilsInterface {
         } else {
             return 0.0;
         }
-    }
-
-    /**
-     * Accept Image From Path
-     * @param acceptedImageFileExtensions String[]
-     * @param path String
-     * @return boolean is valid or not
-     */
-    public static boolean acceptImageFromPath(String[] acceptedImageFileExtensions, String path) {
-        try {
-            for (String extension : acceptedImageFileExtensions)
-            {
-                if (path.toLowerCase().endsWith(extension))
-                {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            logThis(TAG, "acceptImageFromPath Exception", e);
-        }
-        return false;
-    }
-
-
-    /**
-     * Accept Image From File
-     * @param acceptedImageFileExtensions String[]
-     * @param file File
-     * @return boolean is valid or not
-     */
-    public static boolean acceptImageFromFile(String[] acceptedImageFileExtensions, File file) {
-        try {
-            for (String extension : acceptedImageFileExtensions)
-            {
-                if (file.getName().toLowerCase().endsWith(extension))
-                {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            logThis(TAG, "acceptImageFromFile Exception", e);
-        }
-        return false;
-    }
-
-    /**
-     * Accept Video From Path
-     * @param acceptedVideoFileExtensions String[]
-     * @param path String
-     * @return boolean is valid or not
-     */
-    public static boolean acceptVideoFromPath(String[] acceptedVideoFileExtensions, String path) {
-        try {
-            for (String extension : acceptedVideoFileExtensions)
-            {
-                if (path.toLowerCase().endsWith(extension))
-                {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            logThis(TAG, "acceptVideoFromPath Exception", e);
-        }
-        return false;
-    }
-
-    /**
-     * Accept Video From File
-     * @param acceptedVideoFileExtensions String[]
-     * @param file File
-     * @return boolean is valid or not
-     */
-    public static boolean acceptVideoFromFile(String[] acceptedVideoFileExtensions, File file) {
-        try {
-            for (String extension : acceptedVideoFileExtensions)
-            {
-                if (file.getName().toLowerCase().endsWith(extension))
-                {
-                    return true;
-                }
-            }
-        } catch (Exception e) {
-            logThis(TAG, "acceptVideoFromFile Exception", e);
-        }
-        return false;
     }
 
     /**
@@ -1386,30 +1270,185 @@ public class GlobalUtils implements GlobalUtilsInterface {
     }
 
     /**
-     * Get URI From File Path
-     * @param context Context
-     * @param filePath String
-     * @param applicationID String (BuildConfig.APPLICATION_ID)
-     * @return Uri
+     * Sleep Thread
+     * @param delaySeconds Integer
      */
-    public static Uri getURIFromFilePath(Context context, String filePath, String applicationID) {
-        Uri uri = null;
-        if(GlobalUtils.validateText(filePath)) {
-            try {
-                uri = FileProvider.getUriForFile(context, applicationID + ".provider", new File(filePath));
-            } catch (Exception e) {
-                logThis(TAG, "getURIFromFilePath Exception", e);
-                uri = null;
-            }
-            if(uri == null){
-                try {
-                    uri = Uri.fromFile(new File(filePath));
-                } catch (Exception e) {
-                    logThis(TAG, "getURIFromFilePath Exception", e);
-                }
-            }
+    public static void sleepThread(int delaySeconds) {
+        // Added a sleep statement to match the app's execution delay.
+        // The recommended way to handle such scenarios is to use Espresso idling resources:
+        // https://google.github.io/android-testing-support-library/docs/espresso/idling-resource/index.html
+        try {
+            Thread.sleep(delaySeconds * 1000);
+        } catch (InterruptedException e) {
+            logThis(TAG, "sleepThread InterruptedException", e);
         }
-        return uri;
     }
 
+    /**
+     * Convert String To Long
+     * @param string String
+     * @return Long number
+     */
+    public static Long convertStringToLong(String string) {
+        if (GlobalUtils.validateText(string)) {
+            return Long.parseLong(string);
+        }
+        return 0L;
+    }
+
+    /**
+     * Convert String To Long
+     * @param booleanValue Boolean Value
+     * @param yesAndNo Yes and No or True and False
+     * @return String Text
+     */
+    public static String getHumanReadableBoolean(Boolean booleanValue, boolean yesAndNo) {
+        if (booleanValue == null) {
+            return yesAndNo ? "No" : "False";
+        } else if (booleanValue) {
+            return yesAndNo ? "Yes" : "True";
+        } else {
+            return yesAndNo ? "No" : "False";
+        }
+    }
+
+    /**
+     * Get URI From URL
+     * @param url Link
+     * @return Uri
+     */
+    public static Uri getURIFromURL(String url) {
+        try {
+            if (GlobalUtils.validateText(url)) {
+                return Uri.parse(url);
+            }
+        } catch (Exception e) {
+            logThis(TAG, "getURIFromURL Exception", e);
+        }
+        return null;
+    }
+
+    /**
+     * Get URI From URL
+     * @param allowedChars Allowed Characters (String or null)
+     * @return String encoded URL
+     */
+    public static String encodeURL(String link, String allowedChars) {
+        try {
+            if(allowedChars == null){
+                allowedChars = "@#&=*+-_.,:!?()/~'%";
+            }
+            return Uri.encode(link, allowedChars);
+        } catch (Exception e) {
+            logThis(TAG, "encodeURL Exception", e);
+            return link;
+        }
+    }
+
+    /**
+     * Convert String to Float
+     * @param string text
+     * @return integer number
+     */
+    public static float convertStringToFloat(String string) {
+        if (string != null && !string.isEmpty()) {
+            return Float.parseFloat(string);
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Convert Long to String
+     * @param number long number
+     * @return String number
+     */
+    public static String convertLongToString(long number) {
+        String string = null;
+        try {
+            string = Long.toString(number);
+            if (string.isEmpty()) {
+                string = String.valueOf(number);
+            }
+        } catch (Exception e) {
+            logThis(TAG, "convertLongToString Exception", e);
+        }
+        return string;
+    }
+
+    /**
+     * Convert Float to String
+     * @param number float number
+     * @return String number
+     */
+    public static String convertFloatToString(float number) {
+        String string = null;
+        try {
+            string = Float.toString(number);
+            if (string.isEmpty()) {
+                string = String.valueOf(number);
+            }
+        } catch (Exception e) {
+            logThis(TAG, "convertFloatToString Exception", e);
+        }
+        return string;
+    }
+
+    /**
+     * Get Formatted Date String
+     * @param timeStamp String timestamp
+     * @return String
+     */
+    public static String getFormattedDateString(String timeStamp) {
+        if (validateText(timeStamp)) {
+            LocalDateTime dateTime = LocalDateTime.parse(timeStamp);
+            return dateTime.dayOfWeek().getAsShortText() + " " + getTwoDigitsInt(dateTime.getDayOfMonth()) + ", " + dateTime.monthOfYear().getAsText() +
+                    " " + dateTime.getYear();
+        }
+        return timeStamp;
+    }
+
+    /**
+     * Get Relative Date Time String
+     * @param timestamp String timestamp
+     * @return String
+     */
+    public static String getRelativeDateTimeString(String timestamp) {
+        LocalDateTime localDateTimeNow = LocalDateTime.now();
+        LocalDateTime localDateTime = GlobalUtils.getDateTime(timestamp, null);
+        LocalDateTime localDateTimeYesterday = localDateTime.minusDays(1);
+
+        if (localDateTimeNow.getYear() == localDateTime.getYear() && localDateTimeNow.getMonthOfYear() == localDateTime.getMonthOfYear()) { // Same year same month
+            if (localDateTimeNow.getDayOfMonth() == localDateTime.getDayOfMonth()) { // Today
+                return "Today";
+            } else if (localDateTimeYesterday.getDayOfMonth() == localDateTime.getDayOfMonth()) { // Yesterday
+                return "Yesterday";
+            } else {
+                return getFormattedDateString(timestamp);
+            }
+        } else {
+            return getFormattedDateString(timestamp);
+        }
+    }
+
+    public static boolean getBoolFromBooleanObject(Boolean booleanObj) {
+        return booleanObj != null ? booleanObj : false;
+    }
+
+    public static void setupSwipeRefresh(Context context, SwipeRefreshLayout swipeRefreshLayout) {
+        // setup swipe refresh layout
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setEnabled(true);
+            swipeRefreshLayout.setColorSchemeColors(getColor(context, R.color.black));
+        }
+    }
+
+    public static void disableSwipeRefresh(Context context, SwipeRefreshLayout swipeRefreshLayout) {
+        // setup swipe refresh layout
+        if (swipeRefreshLayout != null) {
+            swipeRefreshLayout.setEnabled(false);
+            swipeRefreshLayout.setRefreshing(false);
+            swipeRefreshLayout.setColorSchemeColors(getColor(context, R.color.black));
+        }
+    }
 }
