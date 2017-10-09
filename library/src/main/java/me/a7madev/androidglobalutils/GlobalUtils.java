@@ -1431,24 +1431,36 @@ public class GlobalUtils implements GlobalUtilsInterface {
         }
     }
 
+    /**
+     * Get Boolean from Boolean Object
+     * @param booleanObj Boolean Object
+     * @return boolean
+     */
     public static boolean getBoolFromBooleanObject(Boolean booleanObj) {
         return booleanObj != null ? booleanObj : false;
     }
 
-    public static void setupSwipeRefresh(Context context, SwipeRefreshLayout swipeRefreshLayout) {
-        // setup swipe refresh layout
+    /**
+     * Setup Swipe Refresh
+     * @param swipeRefreshLayout Swipe Refresh Layout
+     * @param colors Colors array
+     */
+    public static void setupSwipeRefresh(SwipeRefreshLayout swipeRefreshLayout, int... colors) {
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setEnabled(true);
-            swipeRefreshLayout.setColorSchemeColors(getColor(context, R.color.black));
+            swipeRefreshLayout.setColorSchemeColors(colors);
         }
     }
 
-    public static void disableSwipeRefresh(Context context, SwipeRefreshLayout swipeRefreshLayout) {
+    /**
+     * Disable Swipe Refresh
+     * @param swipeRefreshLayout Swipe Refresh Layout
+     */
+    public static void disableSwipeRefresh(SwipeRefreshLayout swipeRefreshLayout) {
         // setup swipe refresh layout
         if (swipeRefreshLayout != null) {
             swipeRefreshLayout.setEnabled(false);
             swipeRefreshLayout.setRefreshing(false);
-            swipeRefreshLayout.setColorSchemeColors(getColor(context, R.color.black));
         }
     }
 }
