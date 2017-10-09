@@ -14,7 +14,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -27,7 +26,6 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
@@ -1464,4 +1462,71 @@ public class GlobalUtils implements GlobalUtilsInterface {
             swipeRefreshLayout.setRefreshing(false);
         }
     }
+
+    /**
+     * Convert List to String
+     * @param stringList Strings list
+     * @param listSeparator List seperator: ,
+     */
+    public static String convertListToString(List<String> stringList, String listSeparator) {
+
+        if (stringList != null && stringList.size() > 0) {
+
+            StringBuilder stringBuffer = new StringBuilder();
+            for (String str : stringList) {
+                stringBuffer.append(str).append(listSeparator);
+            }
+
+            // Remove last separator
+            int lastIndex = stringBuffer.lastIndexOf(listSeparator);
+            stringBuffer.delete(lastIndex, lastIndex + listSeparator.length() + 1);
+
+            return stringBuffer.toString();
+
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Convert Int To Boolean
+     * @param number Strings list
+     * @return boolean
+     */
+    public static boolean convertIntToBoolean(int number) {
+        return number == 1;
+    }
+
+    /**
+     * Convert Boolean To Int
+     * @param bool boolean
+     * @return integer
+     */
+    public static int convertBooleanToInt(boolean bool) {
+        if (bool) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    /**
+     * Init Spinner From List
+     * @param context Context
+     * @param itemsList List of strings
+     * @return ArrayAdapter
+     */
+    public static ArrayAdapter<String> initSpinnerFromList(Context context, List<String> itemsList) {
+        return new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, itemsList);
+    }
+
+    /**
+     * Convert Integer to String
+     * @param integer Integer
+     * @return String
+     */
+    public static String convertIntegerToString(int integer) {
+        return Integer.toString(integer);
+    }
+
 }

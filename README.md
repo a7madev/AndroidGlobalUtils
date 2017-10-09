@@ -62,7 +62,6 @@ GlobalUtils Class
 * convertPxToDp
 * getCalendarMonthDisplay
 * convertStringToInt
-* isDeviceOnline
 * convertDoubleToString
 * dismissAlertDialog
 * dismissLoading
@@ -109,6 +108,11 @@ GlobalUtils Class
 * getBoolFromBooleanObject
 * setupSwipeRefresh
 * disableSwipeRefresh
+* convertListToString
+* convertIntToBoolean
+* convertBooleanToInt
+* initSpinnerFromList
+* convertIntegerToString
 
 
 GlobalFileUtils Class
