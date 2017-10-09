@@ -1330,6 +1330,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
 
     /**
      * Get URI From URL
+     * @param link Link
      * @param allowedChars Allowed Characters (String or null)
      * @return String encoded URL
      */
