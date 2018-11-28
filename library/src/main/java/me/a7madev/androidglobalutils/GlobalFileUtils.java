@@ -10,6 +10,8 @@ import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.FileProvider;
 import android.webkit.MimeTypeMap;
 
@@ -30,16 +32,22 @@ public class GlobalFileUtils {
      * @param uri File uri
      * @return Mime type string
      */
-    public static String getMimeType(Context context, Uri uri) {
-        String mimeType = null;
+    public static String getMimeType(@Nullable Context context, @NonNull Uri uri) {
+        String mimeType = null, extension = null;
+        String path = uri.getEncodedPath();
         try {
-            if (uri.getScheme().equals(ContentResolver.SCHEME_CONTENT)) {
+            if(path != null && !path.isEmpty()){
+                extension = MimeTypeMap.getFileExtensionFromUrl(path.toLowerCase());
+            }
+            if (extension == null || extension.isEmpty()) {
+                String mimeTypeMap = MimeTypeMap.getFileExtensionFromUrl(path.substring(path.lastIndexOf(".")));
+                mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(mimeTypeMap);
+            } else {
+                mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.toLowerCase());
+            }
+            if(context != null && mimeType == null){
                 ContentResolver cr = context.getContentResolver();
                 mimeType = cr.getType(uri);
-            } else {
-                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(uri.toString());
-                mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(
-                        fileExtension.toLowerCase());
             }
         } catch (Exception e) {
             logThis(TAG, "getMimeType Exception", e);

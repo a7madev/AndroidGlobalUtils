@@ -1467,6 +1467,7 @@ public class GlobalUtils implements GlobalUtilsInterface {
      * Convert List to String
      * @param stringList Strings list
      * @param listSeparator List seperator: ,
+     * @return String
      */
     public static String convertListToString(List<String> stringList, String listSeparator) {
 
